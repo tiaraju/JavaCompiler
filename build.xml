@@ -1,0 +1,27 @@
+<project name="JavaCompiler" basedir="." default="jar">
+
+	<!-- PROPERTIES -->
+	<property file="build.properties" />
+
+	<!-- TASKs -->
+
+	<target name="clean">
+		<delete file="${scanner.java}" />
+		<delete file="${parser.java}" />
+		<delete file="${sym.java}" />
+		<delete dir="${bin}" />
+		<delete dir="${dist}" />
+	</target>
+
+	<target name="init" depends="">
+		<mkdir dir="${bin}" />
+		<mkdir dir="${dist}" />
+	</target>
+
+	<target name="jflex" depends="init">
+		<java jar="${jflex.jar}" fork="true">
+			<arg line="${jflex.args}" />
+		</java>
+	</target>
+
+</project>
