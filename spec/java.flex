@@ -47,6 +47,17 @@ WhiteSpace = {LineTerminator} | [ \t\f]
 /* numeric */
 IntegerLiteral = 0 | [1-9][0-9]*
 
+/* floats */
+FloatLiteral = {IntegerLiteral} "." {IntegerLiteral}
+
+/* strings */
+Marker = [\"]
+
+StringLiteral = {Marker}  [a-zA-Z0-9_]*     {Marker}
+
+/* comments */
+Comment = "/**" ( [^*] | \*+ [^/*] )* "*"+ "/"
+    
 %%
 
 <YYINITIAL> {
@@ -115,6 +126,13 @@ IntegerLiteral = 0 | [1-9][0-9]*
 /* Integer literals */  
   {IntegerLiteral}               { return symbol(sym.INTEGER_LITERAL, new String(yytext()));}
   
+/* Float literals */  
+  {FloatLiteral}               { return symbol(sym.FLOAT_LITERAL, new String(yytext()));}
+  
+  
+/* Comments*/
+  {Comment}                      { /* just ignore it */ }
+  
 /* separators */
   "("                            { return symbol(sym.LPAREN); }
   ")"                            { return symbol(sym.RPAREN); }
@@ -127,7 +145,7 @@ IntegerLiteral = 0 | [1-9][0-9]*
   "."   		  				 { return symbol(sym.DOT); }
   
  /* TODO string literal */
-  \"                             { return symbol(sym.STRING_LITERAL,yytext()); }
+  {StringLiteral}                { return symbol(sym.STRING_LITERAL,new String(yytext())); }
   
  /* White spaces */
   {WhiteSpace}					 { /* just ignore it*/}
