@@ -8,12 +8,9 @@ import compiler.core.*;
 %public
 %class Scanner
 %implements sym
-
 %unicode
-
 %line
 %column
-
 %cup
 %cupdebug
 

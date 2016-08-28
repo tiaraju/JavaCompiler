@@ -24,4 +24,32 @@
 		</java>
 	</target>
 
+	<target name="cup">
+		<java jar="${cup.jar}" fork="true">
+			<arg line="${cup.args}" />
+		</java>
+	</target>
+	<target name="generate" depends="jflex, cup">
+		<echo message="Running JFlex and CUP tasks" />
+	</target>
+
+	<target name="compile" depends="generate">
+		<javac srcdir="${src}" destdir="${bin}" includeantruntime="false">
+			<classpath>
+				<fileset dir="${libs}">
+					<include name="**/*.jar" />
+				</fileset>
+			</classpath>
+		</javac>
+	</target>
+
+	<target name="jar" depends="compile">
+		<jar destfile="${jar.dist}" basedir="${bin}">
+			<zipgroupfileset dir="${libs}" includes="java-cup-11a.jar" />
+			<manifest>
+				<attribute name="Main-Class" value="${main.class}" />
+			</manifest>
+		</jar>
+	</target>
+
 </project>
