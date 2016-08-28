@@ -44,6 +44,8 @@ Identifier = [:jletter:][:jletterdigit:]*
 LineTerminator = \r|\n|\r\n
 WhiteSpace = {LineTerminator} | [ \t\f]
 
+/* numeric */
+IntegerLiteral = 0 | [1-9][0-9]*
 
 %%
 
@@ -97,18 +99,23 @@ WhiteSpace = {LineTerminator} | [ \t\f]
   "try"                          { return symbol(sym.TRY); }
   "void"                         { return symbol(sym.VOID); }
   "while"                        { return symbol(sym.WHILE); }
+  
+  /* check how to consider this later
   "x"							 { return symbol(sym.X);}
   "d"							 { return symbol(sym.D);}
   "e"							 { return symbol(sym.E);}
   "f"							 { return symbol(sym.F);}
   "l"							 { return symbol(sym.L);}
+  */
        
-     
-   
   
-  /* Identifier*/
+/* Identifier*/
   {Identifier} 					 { return symbol(sym.IDENTIFIER,yytext());}
-    /* separators */
+
+/* Integer literals */  
+  {IntegerLiteral}               { return symbol(sym.INTEGER_LITERAL, new String(yytext()));}
+  
+/* separators */
   "("                            { return symbol(sym.LPAREN); }
   ")"                            { return symbol(sym.RPAREN); }
   "{"                            { return symbol(sym.LBRACE); }
@@ -119,9 +126,51 @@ WhiteSpace = {LineTerminator} | [ \t\f]
   ","                            { return symbol(sym.COMMA); }
   "."   		  				 { return symbol(sym.DOT); }
   
-  /* string literal */
+ /* TODO string literal */
   \"                             { return symbol(sym.STRING_LITERAL,yytext()); }
   
-  /* White spaces */
-  {WhiteSpace}					  { /* just ignore it*/}
+ /* White spaces */
+  {WhiteSpace}					 { /* just ignore it*/}
+   
+ /* attr operator */
+ 	"="							 {return symbol(sym.EQ);}
+ 
+/* arithmetical operators*/
+"+" 							 {return symbol(sym.PLUS);}
+"-" 							 {return symbol(sym.MINUS);}
+"*" 							 {return symbol(sym.MULT);}
+"/"							     {return symbol(sym.DIV);}
+"++"							 {return symbol(sym.PLUSPLUS);}
+"+="							 {return symbol(sym.PLUSEQ);}
+"-="							 {return symbol(sym.MINUSEQ);}
+"*="						     {return symbol(sym.MULTEQ);}
+"/="				             {return symbol(sym.DIVEQ);}
+"--"							 {return symbol(sym.MINUSMINUS);}
+"%"							     {return symbol(sym.MOD);}
+"<<"							 {return symbol(sym.LSHIFT);}
+">>"							 {return symbol(sym.RSHIFT);}
+">>>"							 {return symbol(sym.URSHIFT);}
+
+
+ /* Logical Operators*/
+ "=="							 {return symbol(sym.EQEQ);}
+ ">="							 {return symbol(sym.GTEQ);}
+ "<="							 {return symbol(sym.LTEQ);}
+ "<"							 {return symbol(sym.LT);}
+ ">"							 {return symbol(sym.GT);}
+ "||"							 {return symbol(sym.OROR);}
+ "&&"							 {return symbol(sym.ANDAND);}
+ "&"							 {return symbol(sym.AND);}
+ "!"							 {return symbol(sym.NOT);}
+ "!="							 {return symbol(sym.NOTEQ);}
+ "|"							 {return symbol(sym.OR);}
+ "&="							 {return symbol(sym.ANDEQ);}
+ "|="							 {return symbol(sym.OREQ);}
+ "^"						     {return symbol(sym.XOR);}
+ "^="                            {return symbol(sym.XOREQ);}
+ ">>="							 {return symbol(sym.RSHIFTEQ);}
+ "<<="							 {return symbol(sym.LSHIFTEQ);}
+ 
+ 
+
  }
