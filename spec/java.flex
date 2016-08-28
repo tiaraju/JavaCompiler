@@ -53,7 +53,7 @@ FloatLiteral = {IntegerLiteral} "." {IntegerLiteral}
 /* strings */
 Marker = [\"]
 
-StringLiteral = {Marker}  [a-zA-Z0-9_]*     {Marker}
+StringLiteral = {Marker}  [ \r|\n|\r\n\t\f a-zA-Z0-9_]*     {Marker}
 
 /* comments */
 Comment = "/**" ( [^*] | \*+ [^/*] )* "*"+ "/"

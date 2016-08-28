@@ -59,6 +59,10 @@ public class Test(){
 		String d = "Aa";
 		String e = "A12";
 		String f = "09";
+		String g = "Mauhsuwswijsiks wuhedywghdwujsoqwks dhywgdywqgsuqjsiqjs uwhsdywgduhsiqjsqs"
+		String h = "Mauhsuwswijsiks wuhedywghdwujsoqwks dhywgdywqgsuqjsiqjs uwhs
+					Mauhsuwswijsiks wuhedywghdwujsoqwks dhywgdywqgsuqjsiqjs uwhs"
+				+ "Mauhsuwswijsiks wuhedywghdwujsoqwks dhywgdywqgsuqjsiqjs uwhs"
 		/** TOFIX String g = "!:_)(*&&¨*)"*/
 		
 	}
