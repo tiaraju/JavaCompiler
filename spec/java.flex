@@ -37,6 +37,14 @@ import compiler.core.*;
   }
 %}
 
+/* identifiers */
+Identifier = [:jletter:][:jletterdigit:]*	
+
+/* white spaces*/
+LineTerminator = \r|\n|\r\n
+WhiteSpace = {LineTerminator} | [ \t\f]
+
+
 %%
 
 <YYINITIAL> {
@@ -50,17 +58,18 @@ import compiler.core.*;
   "catch"                        { return symbol(sym.CATCH); }
   "char"                         { return symbol(sym.CHAR); }
   "class"                        { return symbol(sym.CLASS); }
-  "const"                        { return symbol(sym.CONST); }
   "continue"                     { return symbol(sym.CONTINUE); }
+  "default"                      { return symbol(sym.DEFAULT); }
   "do"                           { return symbol(sym.DO); }
   "double"                       { return symbol(sym.DOUBLE); }
   "else"                         { return symbol(sym.ELSE); }
   "extends"                      { return symbol(sym.EXTENDS); }
+  "false"						 { return symbol(sym.FALSE);}
   "final"                        { return symbol(sym.FINAL); }
   "finally"                      { return symbol(sym.FINALLY); }
   "float"                        { return symbol(sym.FLOAT); }
   "for"                          { return symbol(sym.FOR); }
-  "default"                      { return symbol(sym.DEFAULT); }
+  "if"                           { return symbol(sym.IF); }
   "implements"                   { return symbol(sym.IMPLEMENTS); }
   "import"                       { return symbol(sym.IMPORT); }
   "instanceof"                   { return symbol(sym.INSTANCEOF); }
@@ -69,25 +78,50 @@ import compiler.core.*;
   "long"                         { return symbol(sym.LONG); }
   "native"                       { return symbol(sym.NATIVE); }
   "new"                          { return symbol(sym.NEW); }
-  "goto"                         { return symbol(sym.GOTO); }
-  "if"                           { return symbol(sym.IF); }
-  "public"                       { return symbol(sym.PUBLIC); }
-  "short"                        { return symbol(sym.SHORT); }
-  "super"                        { return symbol(sym.SUPER); }
-  "switch"                       { return symbol(sym.SWITCH); }
-  "synchronized"                 { return symbol(sym.SYNCHRONIZED); }
+  "null"                         { return symbol(sym.NULL); }
   "package"                      { return symbol(sym.PACKAGE); }
   "private"                      { return symbol(sym.PRIVATE); }
   "protected"                    { return symbol(sym.PROTECTED); }
-  "transient"                    { return symbol(sym.TRANSIENT); }
+  "public"                       { return symbol(sym.PUBLIC); }
   "return"                       { return symbol(sym.RETURN); }
-  "void"                         { return symbol(sym.VOID); }
+  "short"                        { return symbol(sym.SHORT); }
   "static"                       { return symbol(sym.STATIC); }
-  "while"                        { return symbol(sym.WHILE); }
+  "super"                        { return symbol(sym.SUPER); }
+  "switch"                       { return symbol(sym.SWITCH); }
+  "synchronized"                 { return symbol(sym.SYNCHRONIZED); }
   "this"                         { return symbol(sym.THIS); }
+  "threadsafe"					 { return symbol(sym.THREADSAFE);}
   "throw"                        { return symbol(sym.THROW); }
-  "throws"                       { return symbol(sym.THROWS); }
+  "transient"                    { return symbol(sym.TRANSIENT); }
+  "true"						 { return symbol(sym.TRUE);}
   "try"                          { return symbol(sym.TRY); }
-  "volatile"                     { return symbol(sym.VOLATILE); }
-  "strictfp"                     { return symbol(sym.STRICTFP); }
+  "void"                         { return symbol(sym.VOID); }
+  "while"                        { return symbol(sym.WHILE); }
+  "x"							 { return symbol(sym.X);}
+  "d"							 { return symbol(sym.D);}
+  "e"							 { return symbol(sym.E);}
+  "f"							 { return symbol(sym.F);}
+  "l"							 { return symbol(sym.L);}
+       
+     
+   
+  
+  /* Identifier*/
+  {Identifier} 					 { return symbol(sym.IDENTIFIER,yytext());}
+    /* separators */
+  "("                            { return symbol(sym.LPAREN); }
+  ")"                            { return symbol(sym.RPAREN); }
+  "{"                            { return symbol(sym.LBRACE); }
+  "}"                            { return symbol(sym.RBRACE); }
+  "["                            { return symbol(sym.LBRACK); }
+  "]"                            { return symbol(sym.RBRACK); }
+  ";"                            { return symbol(sym.SEMICOLON); }
+  ","                            { return symbol(sym.COMMA); }
+  "."   		  				 { return symbol(sym.DOT); }
+  
+  /* string literal */
+  \"                             { return symbol(sym.STRING_LITERAL,yytext()); }
+  
+  /* White spaces */
+  {WhiteSpace}					  { /* just ignore it*/}
  }

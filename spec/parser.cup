@@ -63,6 +63,10 @@ parser code  {:
 
 terminal BOOLEAN; // primitive_type
 terminal BYTE, SHORT, INT, LONG, CHAR; // integral_type
+terminal D, E, F, X, L; // number representation
+terminal TRUE, FALSE; // boolean terminals 
+terminal NULL; // null terminal
+terminal THREADSAFE; // threadsafe terminal
 terminal FLOAT, DOUBLE; // floating_point_type
 terminal LBRACK, RBRACK; // array_type
 terminal DOT; // qualified_name

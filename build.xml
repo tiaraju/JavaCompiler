@@ -29,7 +29,7 @@
 			<arg line="${cup.args}" />
 		</java>
 	</target>
-	<target name="generate" depends="jflex, cup">
+	<target name="generate" depends="clean, jflex, cup">
 		<echo message="Running JFlex and CUP tasks" />
 	</target>
 
