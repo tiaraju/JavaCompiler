@@ -52,8 +52,14 @@ FloatLiteral = {IntegerLiteral}"."{IntegerLiteral}
 
 /* strings */
 Marker = [\"]
+Other_Symbols = \*|\+|\[|\]|\!|\£|\$|\%|\&|\=|\?|\^|\-|\°|\#|\@|\:|\(|\)
+Separators = \r|\n|\r\n\t\f
+Alphanumerics_ = [ a-zA-Z0-9_]
 
-StringLiteral = {Marker}  [ \r|\n|\r\n\t\f a-zA-Z0-9_]*     {Marker}
+temp = [ \*|\+|\[|\]|\!|\£|\$|\%|\&|\=|\?|\^|\-|\°|\#|\@|\:|\(|\)|\"|\r|\n|\r\n\t\f a-zA-Z0-9_]*
+
+StringLiteral = {Marker}   {temp}   {Marker}
+StringContent =  {Alphanumerics_}*StringContent | {Other_Symbols}*StringContent | {Separators}*StringContent /*Fixme: Doesn't work, it obtains stack overflow*/
 
 /* comments */
 Comment = "/**" ( [^*] | \*+ [^/*] )* "*"+ "/"
@@ -77,7 +83,7 @@ Comment = "/**" ( [^*] | \*+ [^/*] )* "*"+ "/"
   "double"                       { return symbol(sym.DOUBLE); }
   "else"                         { return symbol(sym.ELSE); }
   "extends"                      { return symbol(sym.EXTENDS); }
-  "false"						 { return symbol(sym.FALSE);}
+  "false"						           { return symbol(sym.FALSE);}
   "final"                        { return symbol(sym.FINAL); }
   "finally"                      { return symbol(sym.FINALLY); }
   "float"                        { return symbol(sym.FLOAT); }
@@ -127,6 +133,9 @@ Comment = "/**" ( [^*] | \*+ [^/*] )* "*"+ "/"
 
 /* Integer literals */  
   {IntegerLiteral}               { return symbol(sym.INTEGER_LITERAL, new String(yytext()));}
+
+/* character literal */
+  \'                             { return symbol(sym.CHARLITERAL); }
   
 /* Comments*/
   {Comment}                      { /* just ignore it */ }

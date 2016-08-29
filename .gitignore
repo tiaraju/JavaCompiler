@@ -3,3 +3,7 @@
 .project
 src/compiler/generated/Scanner.java~
 bin/
+.settings/*
+src/compiler/generated/Parser.java
+src/compiler/generated/Scanner.java
+src/compiler/generated/sym.java
