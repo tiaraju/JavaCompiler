@@ -176,6 +176,9 @@ Comment = "/**" ( [^*] | \*+ [^/*] )* "*"+ "/"
 ">>"							 {return symbol(sym.RSHIFT);}
 ">>>"							 {return symbol(sym.URSHIFT);}
 
+/* operators */
+":"                              {return symbol(COLON);}
+
 
  /* Logical Operators*/
  "=="							 {return symbol(sym.EQEQ);}

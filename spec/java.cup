@@ -110,12 +110,28 @@ non terminal type_declaration;
 non terminal identifier;
 non terminal modifier;
 non terminal field_declaration;
-
-// TODO
 non terminal method_declaration;
 non terminal constructor_declaration;
 non terminal variable_declaration;
 non terminal static_initializer;
+non terminal type;
+non terminal parameter_list;
+non terminal statement_block;
+non terminal variable_declarator;
+non terminal type_specifier;
+non terminal parameter;
+non terminal statement;
+
+// TODO
+non terminal variable_initializer;
+non terminal expression;
+non terminal if_statement;
+non terminal do_statement;
+non terminal while_statement;
+non terminal for_statement;
+non terminal try_statement;
+non terminal switch_statement;
+
 
 //RULES
 
@@ -184,4 +200,70 @@ field_declaration ::=
       | variable_declaration  
       | static_initializer 
       | SEMICOLON 
+;
+
+method_declaration ::= 
+      modifier  type identifier 
+      LPAREN  parameter_list  RPAREN  LBRACK RBRACK  
+      statement_block | SEMICOLON  
+;
+
+constructor_declaration ::= 
+      modifier identifier LPAREN  parameter_list  RPAREN 
+      statement_block 
+;
+
+variable_declaration ::= 
+       modifier type variable_declarator 
+       COMMA variable_declarator SEMICOLON 
+;
+
+static_initializer ::= STATIC statement_block
+;
+
+type ::= type_specifier LBRACK RBRACK
+;
+
+parameter_list ::=  parameter COMMA parameter 
+;
+
+statement_block ::= LBRACE statement RBRACE
+;
+ 
+ variable_declarator ::= identifier LBRACK RBRACK EQ variable_initializer
+;
+
+type_specifier ::= 
+ 		BOOLEAN 
+      | BYTE
+      | CHAR 
+      | SHORT 
+      | INT 
+      | FLOAT 
+      | LONG 
+      | DOUBLE 
+      | class_name 
+      | interface_name 
+;
+
+parameter ::= type identifier LBRACK RBRACK
+; 
+
+statement ::= 
+         variable_declaration 
+      |  expression SEMICOLON
+      |  statement_block 
+      |  if_statement  
+      |  do_statement
+      |  while_statement 
+      |  for_statement  
+      |  try_statement 
+      |  switch_statement  
+      |  SYNCHRONIZED LPAREN expression RPAREN statement  
+      |  RETURN  expression  SEMICOLON  
+      |  THROW expression SEMICOLON  
+      |  identifier COLON statement  
+      |  BREAK  identifier  SEMICOLON  
+      |  CONTINUE identifier SEMICOLON  
+      |  SEMICOLON 
 ;
