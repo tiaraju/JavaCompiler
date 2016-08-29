@@ -48,7 +48,7 @@ WhiteSpace = {LineTerminator} | [ \t\f]
 IntegerLiteral = 0 | [1-9][0-9]*
 
 /* floats */
-FloatLiteral = {IntegerLiteral} "." {IntegerLiteral}
+FloatLiteral = {IntegerLiteral}"."{IntegerLiteral}
 
 /* strings */
 Marker = [\"]
@@ -111,7 +111,7 @@ Comment = "/**" ( [^*] | \*+ [^/*] )* "*"+ "/"
   "void"                         { return symbol(sym.VOID); }
   "while"                        { return symbol(sym.WHILE); }
   
-  /* check how to consider this later
+  /* check how to consider those later
   "x"							 { return symbol(sym.X);}
   "d"							 { return symbol(sym.D);}
   "e"							 { return symbol(sym.E);}
@@ -119,16 +119,14 @@ Comment = "/**" ( [^*] | \*+ [^/*] )* "*"+ "/"
   "l"							 { return symbol(sym.L);}
   */
        
-  
 /* Identifier*/
   {Identifier} 					 { return symbol(sym.IDENTIFIER,yytext());}
 
+/* Float literals */  
+  {FloatLiteral} 				 { return symbol(sym.FLOATING_POINT_LITERAL, new String(yytext()));}
+
 /* Integer literals */  
   {IntegerLiteral}               { return symbol(sym.INTEGER_LITERAL, new String(yytext()));}
-  
-/* Float literals */  
-  {FloatLiteral}               { return symbol(sym.FLOAT_LITERAL, new String(yytext()));}
-  
   
 /* Comments*/
   {Comment}                      { /* just ignore it */ }
