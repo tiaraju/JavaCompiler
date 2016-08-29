@@ -83,7 +83,7 @@ Comment = "/**" ( [^*] | \*+ [^/*] )* "*"+ "/"
   "double"                       { return symbol(sym.DOUBLE); }
   "else"                         { return symbol(sym.ELSE); }
   "extends"                      { return symbol(sym.EXTENDS); }
-  "false"						           { return symbol(sym.FALSE);}
+  "false"						 { return symbol(sym.FALSE);}
   "final"                        { return symbol(sym.FINAL); }
   "finally"                      { return symbol(sym.FINALLY); }
   "float"                        { return symbol(sym.FLOAT); }
@@ -135,7 +135,7 @@ Comment = "/**" ( [^*] | \*+ [^/*] )* "*"+ "/"
   {IntegerLiteral}               { return symbol(sym.INTEGER_LITERAL, new String(yytext()));}
 
 /* character literal */
-  \'                             { return symbol(sym.CHARLITERAL); }
+  \'                             { return symbol(sym.CHARACTER_LITERAL); }
   
 /* Comments*/
   {Comment}                      { /* just ignore it */ }
@@ -177,7 +177,7 @@ Comment = "/**" ( [^*] | \*+ [^/*] )* "*"+ "/"
 ">>>"							 {return symbol(sym.URSHIFT);}
 
 /* operators */
-":"                              {return symbol(COLON);}
+":"                              {return symbol(sym.COLON);}
 
 
  /* Logical Operators*/
