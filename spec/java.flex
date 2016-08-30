@@ -172,6 +172,7 @@ Comment = "/**" ( [^*] | \*+ [^/*] )* "*"+ "/"
 "/="				             {return symbol(sym.DIVEQ);}
 "--"							 {return symbol(sym.MINUSMINUS);}
 "%"							     {return symbol(sym.MOD);}
+"%="							 {return symbol(sym.MODEQ);}
 "<<"							 {return symbol(sym.LSHIFT);}
 ">>"							 {return symbol(sym.RSHIFT);}
 ">>>"							 {return symbol(sym.URSHIFT);}

@@ -1,0 +1,329 @@
+//RULES
+
+arglist ::= 
+      expression
+      | arglist COMMA expression
+     ;
+     
+bit_expression ::= 
+      COMP expression 
+      | expression RSHIFTEQ expression
+      | expression LSHIFT expression
+      | expression RSHIFT expression
+      | expression URSHIFT expression 
+     ;
+     
+casting_expression ::= 
+      LPAREN type RPAREN expression 
+     ; 
+     
+extends_class_opt ::= | EXTENDS class_name ;
+interface_opt ::= | interfaces ;
+interfaces ::=	IMPLEMENTS interface_type_list
+	;
+interface_type_list ::= 
+		interface_type
+	|	interface_type_list COMMA interface_type
+	;
+class_declaration ::= 
+       modifier CLASS identifier 
+      extends_class_opt
+      implements_interface_opt
+      LBRACE field_declaration RBRACE 
+      ;
+
+class_name ::= 
+      identifier 
+      | package_name DOT identifier 
+     ;
+     
+package_statement_opt ::= | package_statement;
+compilation_unit ::= 
+      package_statement_opt
+      import_statement 
+      type_declaration 
+     ;
+     
+constructor_declaration ::= 
+      modifier identifier LPAREN parameter_list_opt RPAREN
+      statement_block 
+     ;
+     
+expression_bracks_opt ::= | LBRACK expression RLBRACK ;
+creating_expression ::= 
+      NEW classe_name LPAREN arglist_opt RPAREN 
+      | NEW type_specifier expression_bracks_opt LBRACK RLBRACK 
+      | NEW LPAREN expression RPAREN 
+	;
+	
+do_statement ::=
+		DO statement WHILE LPAREN expression RPAREN SEMICOLON
+	;
+	
+arglist_opt ::= | arglist ;
+class_or_interface ::= class_name | interface_name ;
+expression ::= 
+      numeric_expression 
+      | testing_expression 
+      | logical_expression 
+      | string_expression 
+      | bit_expression 
+      | casting_expression 
+      | creating_expression 
+      | literal_expression 
+      | NULL 
+      | SUPER 
+      | THIS 
+      | identifier 
+      | LPAREN expression RPAREN  
+      | expression LPAREN arglist_opt RPAREN 
+      | expression LBRACK expression RBRACK 
+      | expression DOT expression 
+      | expression COMMA expression 
+      | expression INSTANCEOF class_or_interface 
+	;
+	
+types_declarations ::= 
+	  method_declaration 
+      | constructor_declaration 
+      | variable_declaration 
+	;
+	
+field_declaration ::= 
+      types_declarations 
+      | static_initializer 
+      | SEMICOLON
+     ;
+
+expression_opt ::= | expression ;
+expression_semicolon ::= expression SEMICOLON ;
+part_for ::= variable_declaration | expression_semicolon | SEMICOLON ;
+for_statement ::= 
+      FOR LPAREN  
+      part_for  
+      expression_opt SEMICOLON
+      expression_opt SEMICOLON 
+      RPAREN statement 
+	;
+	
+else_opt ::= | ELSE statement ;
+if_statement ::= 
+      IF LPAREN expression RPAREN statement 
+      else_opt 
+     ;
+     
+import_statement ::= 
+     IMPORT package_name DOT MULT SEMICOLON
+     | IMPORT class_name SEMICOLON
+     | IMPORT interface_name SEMICOLON
+	;      
+	
+interface_declaration ::=
+		modifier INTERFACE identifier extends_interfaces_opt 
+			interface_body
+	;
+extends_interfaces_opt ::=
+	|	extends_interfaces
+	;
+extends_interfaces ::=
+		EXTENDS interface_name
+	|	extends_interfaces COMMA interface_name
+	;
+	
+interface_body ::=
+		LBRACE interface_member_declarations_opt RBRACE
+	;
+interface_member_declarations_opt ::=
+	|	interface_member_declarations
+	;
+interface_member_declarations ::=
+		field_declaration
+	|	interface_member_declarations field_declaration
+	;
+	  
+interface_name ::= 
+      identifier 
+      |  package_name DOT identifier
+	;
+
+literal_expression ::= 
+      INTEGER_LITERAL 
+      | FLOAT_LITERAL 
+      | string               //VEEER
+      | character 
+	;
+	
+logical_expression ::= 
+       NOT expression 
+      | expression AND expression
+      | expression ANDEQ expression 
+      | expression OR expression
+      | expression OREQ expression 
+      | expression XOR expression
+      | expression XOREQ expression 
+      | expression ANDAND expression
+      | expression OROR expression 
+      | expression MOD expression
+      | expression MODEQ expression 
+      | expression QUESTION expression COLON expression
+      | TRUE 
+      | FALSE 
+	;
+
+parameter_list_opt ::= | parameter_list;
+sttm_block_semicolon ::= statement_block | SEMICOLON ;
+method_declaration ::= 
+		modifier type identifier 
+		LPAREN parameter_list_opt RPAREN LBRACK RBRACK
+		sttm_block_semicolon
+	;
+	
+minus_exp ::=  MINUS expression;
+minusminus_exp ::=  MINUSMINUS expression;
+plusplus_exp ::=  PLUSPLUS expression;
+exp_minusminus ::=   expression MINUSMINUS;
+exp_plusplus ::=   expression PLUSPLUS;
+
+numeric_expression ::= 
+      minus_exp
+      | minusminus_exp
+      | plusplus_exp 
+      | exp_plusplus
+      | exp_minusminus
+      | expression PLUS expression
+      | expression PLUSEQ expression 
+      | expression MINUS expression 
+      | expression MINUSEQ expression
+      | expression MULT expression
+      | expression MULTEQ expression 
+      | expression DIV expression
+      | expression DIVEQ expression
+      | expression MOD expression 
+      | expression MODEQ expression  
+	;
+	
+package_name ::= 
+      identifier 
+      | package_name DOT identifier 
+	;
+	
+package_statement ::= 
+      PACKAGE package_name SEMICOLON
+     ;
+     
+parameter ::= 
+      type identifier LBRACK RBRACK 
+	;  
+	
+parameter_list ::= 
+      parameter COMMA parameter 
+	;
+	
+identifier_opt ::= | identifier
+	;
+	
+statement ::=	
+	variable_declaration
+	|	expression SEMICOLON
+	|   statement_block
+	|	if_statement
+	|	do_statement
+	|	while_statement
+	|	for_statement
+	|	try_statement
+	|	switch_statement
+	|	SYNCHRONIZED LPAREN expression RPAREN statement
+	|	RETURN expression_opt SEMICOLON   
+	|	THROW expression SEMICOLON
+	|   identifier COLON statement
+	|	BREAK identifier_opt SEMICOLON 
+    |   CONTINUE identifier_opt SEMICOLON 
+    |   SEMICOLON 
+	;
+	
+statement_block  ::=
+		LBRACE statement RBRACE
+	;
+
+static_initializer ::=
+		static statement_block 
+	;
+
+string_expression ::= 
+		expression 
+        PLUS 
+      	| PLUSEQ  
+      expression  
+    ;
+
+switch_statement ::=
+	    switch LPAREN expression RPAREN LBRACE
+		 case expression COLON
+		| default COLON
+		| statment
+		RBRACE
+	;
+
+testing_expression ::= 
+       expression 
+       GT
+      | LT 
+      | GTEQ
+      | LTEQ 
+      | EQEQ 
+      | NOTEQ
+      expression  
+    ; 
+      
+finally_opt ::= | FINALLY statement 
+	;
+try_statement ::=
+		TRY statement
+		CATCH LPAREN parameter RPAREN statement 
+      	finally_opt
+	;
+
+type ::= 
+      type_specifier LBRACK RBRACK
+     ;
+doc_comment_opt ::= | doc_comment ;
+class_or_interface_declaration ::= class_declaration | interface_declaration;
+type_declaration ::= 
+      doc_comment_opt class_or_interface_declaration SEMICOLON 
+     ;
+
+type_specifier ::= 
+      BOOLEAN 
+      | BYTE 
+      | CHAR 
+      | SHORT 
+      | INT 
+      | FLOAT 
+      | LONG 
+      | DOUBLE 
+      | class_name 
+      | interface_name 
+	;
+variable_declarator_loop ::= variable_declarator | variable_declarator COMMA variable_declarator ;
+variable_declaration ::=
+		modifier type variable_declarator_loop 
+	;
+eq_variable_initializer_opt ::= | EQ variable_initializer 
+	;
+variable_declarator ::=
+		identifier LBRACK RBRACK eq_variable_initializer_opt
+	;
+		
+comma_opt ::= | COMMA
+	;
+variable_initializer_opt ::= | variable_initializer 
+      COMMA variable_initializer comma_opt 
+
+variable_initializer ::=
+		expression
+	|	LBRACE variable_initializer_opt   RBRACE
+	;
+	
+while_statement ::=
+		WHILE LPAREN expression RPAREN statement
+	;
