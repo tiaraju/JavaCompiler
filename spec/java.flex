@@ -178,6 +178,8 @@ Comment = "/**" ( [^*] | \*+ [^/*] )* "*"+ "/"
 
 /* operators */
 ":"                              {return symbol(sym.COLON);}
+"~"                              {return symbol(sym.COMP); }
+
 
 
  /* Logical Operators*/
@@ -198,7 +200,6 @@ Comment = "/**" ( [^*] | \*+ [^/*] )* "*"+ "/"
  "^="                            {return symbol(sym.XOREQ);}
  ">>="							 {return symbol(sym.RSHIFTEQ);}
  "<<="							 {return symbol(sym.LSHIFTEQ);}
+ "?"                             { return symbol(sym.QUESTION); }
  
- 
-
  }

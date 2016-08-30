@@ -121,22 +121,59 @@ non terminal variable_declarator;
 non terminal type_specifier;
 non terminal parameter;
 non terminal statement;
-
-// TODO
 non terminal variable_initializer;
 non terminal expression;
 non terminal if_statement;
 non terminal do_statement;
 non terminal while_statement;
 non terminal for_statement;
+non terminal expression_opt;
 non terminal try_statement;
+non terminal finally_statement_opt;
 non terminal switch_statement;
-
+non terminal numeric_expression;
+non terminal testing_expression;
+non terminal logical_expression;
+non terminal string_expression;
+non terminal bit_expression;
+non terminal casting_expression;
+non terminal creating_expression;
+non terminal arglist_opt;
+non terminal expression_brack_opt;
+non terminal literal_expression;
+non terminal arglist;
+non terminal integer_literal;
+non terminal decimal_digits_opt;
+non terminal exponent_part_opt;
+non terminal float_type_suffix_opt;
+non terminal float_literal;
+non terminal string;
+non terminal character;
+non terminal decimal_digits;
+non terminal exponent_part;
+non terminal float_type_suffix;
+non terminal extends_opt;
+non terminal implements_opt;
+non terminal implements_compl;
+non terminal package_statement_opt;
+non terminal parameter_list_opt;
+non terminal doc_comment_opt;
+non terminal else_statement_opt;
+non terminal extends_interface_opt;
+non terminal extends_mult_interface_opt;
+non terminal return_expression_opt;
+non terminal identifier_opt;
+non terminal eq_variable_initializer_opt;
+non terminal variable_comma_opt;
+non terminal variable_mult_comma;
+non terminal variable_initializer_opt;
 
 //RULES
 
+package_statement_opt ::= | package_statement
+;
 compilation_unit  ::= 
-  package_statement  
+  package_statement_opt  
   import_statement  
   type_declaration 
 ;
@@ -150,18 +187,26 @@ import_statement  ::=
  |   class_name  | interface_name SEMICOLON 
 ;
 
+doc_comment_opt ::= | doc_comment
+;
 type_declaration  ::= 
-  doc_comment  class_declaration  | interface_declaration SEMICOLON 
+  doc_comment_opt  class_declaration  | interface_declaration SEMICOLON 
 ;
 
 //TODO
 doc_comment  ::=  "/**" "*/" 
 ;
 
+extends_opt ::= | EXTENDS class_name
+;
+implements_opt ::= |  IMPLEMENTS interface_name implements_compl
+; 
+implements_compl ::=  | COMMA interface_name
+;
 class_declaration  ::= 
  modifier CLASS identifier 
- EXTENDS class_name  
- IMPLEMENTS interface_name  COMMA interface_name
+ extends_opt
+ implements_opt  
  LBRACE   field_declaration   RBRACE
  ; 
  
@@ -175,9 +220,13 @@ interface_name ::=
       |  package_name DOT identifier
 ;
 
+extends_interface_opt ::= | EXTENDS interface_name extends_mult_interface_opt
+;
+extends_mult_interface_opt ::= |  COMMA interface_name
+;
 interface_declaration ::= 
        modifier  INTERFACE identifier 
-       EXTENDS interface_name  COMMA interface_name 
+       extends_interface_opt
        LBRACE  field_declaration  RBRACE
 ;  
 
@@ -195,21 +244,23 @@ modifier ::=
 ;
 
 field_declaration ::= 
-       doc_comment   method_declaration 
+       doc_comment_opt   method_declaration 
       | constructor_declaration 
       | variable_declaration  
       | static_initializer 
       | SEMICOLON 
 ;
 
+parameter_list_opt ::= | parameter_list
+;
 method_declaration ::= 
       modifier  type identifier 
-      LPAREN  parameter_list  RPAREN  LBRACK RBRACK  
+      LPAREN  parameter_list_opt  RPAREN  LBRACK RBRACK  
       statement_block | SEMICOLON  
 ;
 
 constructor_declaration ::= 
-      modifier identifier LPAREN  parameter_list  RPAREN 
+      modifier identifier LPAREN  parameter_list_opt  RPAREN 
       statement_block 
 ;
 
@@ -230,7 +281,9 @@ parameter_list ::=  parameter COMMA parameter
 statement_block ::= LBRACE statement RBRACE
 ;
  
- variable_declarator ::= identifier LBRACK RBRACK EQ variable_initializer
+eq_variable_initializer_opt ::= | EQ variable_initializer
+;
+ variable_declarator ::= identifier LBRACK RBRACK eq_variable_initializer_opt 
 ;
 
 type_specifier ::= 
@@ -249,6 +302,10 @@ type_specifier ::=
 parameter ::= type identifier LBRACK RBRACK
 ; 
 
+return_expression_opt ::= | expression
+;
+identifier_opt ::= | identifier
+;
 statement ::= 
          variable_declaration 
       |  expression SEMICOLON
@@ -260,10 +317,210 @@ statement ::=
       |  try_statement 
       |  switch_statement  
       |  SYNCHRONIZED LPAREN expression RPAREN statement  
-      |  RETURN  expression  SEMICOLON  
+      |  RETURN  return_expression_opt  SEMICOLON  
       |  THROW expression SEMICOLON  
       |  identifier COLON statement  
-      |  BREAK  identifier  SEMICOLON  
-      |  CONTINUE identifier SEMICOLON  
+      |  BREAK  identifier_opt  SEMICOLON  
+      |  CONTINUE identifier_opt SEMICOLON  
       |  SEMICOLON 
 ;
+
+variable_comma_opt ::= | COMMA
+;
+variable_mult_comma ::= | COMMA variable_initializer
+;
+variable_initializer_opt ::=variable_initializer variable_mult_comma  
+							variable_comma_opt
+;  
+variable_initializer ::= 
+      expression 
+      | LBRACE  variable_initializer_opt RBRACE
+;
+
+arglist_opt ::= | arglist
+;
+expression ::= 
+      numeric_expression 
+      | testing_expression 
+      | logical_expression 
+      | string_expression 
+      | bit_expression 
+      | casting_expression 
+      | creating_expression 
+      | literal_expression 
+      | NULL 
+      | SUPER 
+      | THIS 
+      | identifier 
+      | LPAREN expression RPAREN 
+      | expression LPAREN arglist_opt RPAREN 
+      | LBRACK expression RBRACK 
+      | DOT expression 
+      | COMMA expression 
+      | INSTANCEOF class_name | interface_name  
+;
+class_name ::= 
+      identifier 
+      | package_name DOT identifier 
+;
+
+else_statement_opt ::= | ELSE statement
+; 
+if_statement ::= 
+      IF LPAREN expression RPAREN statement
+      else_statement_opt 
+;
+
+do_statement ::= 
+      DO statement WHILE LPAREN expression RPAREN SEMICOLON 
+;
+while_statement ::= 
+      WHILE LPAREN expression RPAREN statement 
+;
+
+expression_opt ::= |expression
+;
+
+for_statement ::= 
+      FOR LPAREN variable_declaration |  expression SEMICOLON  | SEMICOLON 
+      expression_opt  SEMICOLON
+      expression_opt  SEMICOLON
+      RPAREN statement 
+;
+finally_statement_opt::= | FINALLY statement
+;
+
+try_statement ::= 
+      TRY statement 
+      CATCH LPAREN parameter RPAREN statement
+      finally_statement_opt
+;
+
+switch_statement ::= 
+      SWITCH LPAREN expression RPAREN LBRACE 
+      CASE expression COLON 
+      | DEFAULT COLON 
+      | statement 
+      RBRACE
+;
+
+numeric_expression ::= 
+      MINUS 
+      | PLUSPLUS
+      | MINUSMINUS expression 
+      | expression PLUSPLUS 
+      | MINUSMINUS 
+      | expression PLUS 
+      | PLUSEQ 
+      | MINUS 
+      | MINUSEQ
+      | MULT 
+      | MULTEQ 
+      | DIV 
+      | DIVEQ 
+      | MOD 
+      | MODEQ 
+      expression 
+;
+
+testing_expression ::= 
+      expression 
+       GT 
+      | LT 
+      | GTEQ 
+      | LTEQ 
+      | EQEQ 
+      | NOTEQ ) 
+      expression
+; 
+
+logical_expression ::= 
+      NOT expression 
+      | expression AND 
+      | ANDEQ 
+      | OR 
+      | OREQ 
+      | XOR 
+      | XOREQ 
+      | AND AND 
+  /*    | OROREQ*/ 
+      | MOD 
+      | MODEQ 
+      expression 
+      | expression QUESTION expression COLON expression 
+      | TRUE 
+      | FALSE
+; 
+
+string_expression ::= 
+	  expression 
+	  PLUS | PLUSEQ 
+      expression
+; 
+
+bit_expression ::= 
+      COMP expression 
+      | expression RSHIFTEQ
+      | LSHIFT 
+      | RSHIFT 
+      | URSHIFT  
+      expression
+; 
+
+casting_expression ::= 
+     LPAREN type RPAREN expression 
+;
+
+expression_brack_opt ::= | LBRACK expression RBRACK
+;
+creating_expression ::= 
+      NEW  class_name LPAREN arglist_opt RPAREN ) 
+      | type_specifier expression_brack_opt  LBRACK RBRACK 
+      | LPAREN expression RPAREN 
+;
+
+literal_expression ::= 
+      integer_literal 
+      | float_literal 
+      | string 
+      | character 
+;
+
+arglist ::= expression  COMMA expression
+; 
+
+integer_literal ::= INTEGER_LITERAL
+      /*| { "0..7" } 
+      | ( "0" "x" "0..9a..f" { "0..9a..f" } ) ) 
+      [ "l" ] 
+*/
+;
+
+decimal_digits_opt ::= | decimal_digits
+;
+exponent_part_opt ::= | exponent_part
+;
+float_type_suffix_opt ::= |float_type_suffix
+;
+float_literal ::= 
+      decimal_digits DOT decimal_digits_opt exponent_part_opt float_type_suffix_opt 
+      | DOT decimal_digits_opt exponent_part_opt float_type_suffix_opt 
+      | decimal_digits_opt exponent_part_opt float_type_suffix_opt 
+ ;
+ 
+ string ::= STRING_LITERAL
+ ;
+ 
+ character ::= CHARACTER_LITERAL
+ ; 
+ 
+decimal_digits ::= INTEGER_LITERAL
+;
+/*float_type_suffix ::= "f" | "d"
+;
+
+plus_minus_opt :== | PLUS | MINUS
+;
+exponent_part ::= 
+      "e" plus_minus_opt decimal_digits
+;*/
