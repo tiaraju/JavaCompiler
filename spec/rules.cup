@@ -1,3 +1,240 @@
+parser code  {: 
+  public void report_error(String message, Object info) {
+    StringBuffer m = new StringBuffer("Error ");
+
+    if (info instanceof java_cup.runtime.Symbol) 
+      m.append( "("+info.toString()+")" );
+     
+    m.append(" : "+message);
+   
+    System.out.println(m);
+  }
+   
+  public void report_fatal_error(String message, Object info) {
+    report_error(message, info);
+    throw new RuntimeException("Fatal Syntax Error");
+  }
+:};
+
+terminal BOOLEAN; // 
+terminal BYTE, SHORT, INT, LONG, CHAR; // OK
+terminal D, E, F, X, L; // 
+terminal TRUE, FALSE; //  
+terminal NULL; // ok
+terminal THREADSAFE; //
+terminal FLOAT, DOUBLE; // 
+terminal LBRACK, RBRACK; // 
+terminal DOT; // 
+terminal SEMICOLON, MULT, COMMA, LBRACE, RBRACE, EQ, LPAREN, RPAREN, COLON;
+terminal PACKAGE; //
+terminal IMPORT; // 
+terminal PUBLIC, PROTECTED, PRIVATE; // 
+terminal STATIC; // 
+terminal ABSTRACT, FINAL, NATIVE, SYNCHRONIZED, TRANSIENT, VOLATILE;
+terminal CLASS; // 
+terminal EXTENDS; // 
+terminal IMPLEMENTS; // interfaces
+terminal VOID; // method_header
+terminal THROWS; // throws
+terminal THIS, SUPER; // ok
+terminal INTERFACE; // interface_declaration
+terminal IF, ELSE; // if_then_statement, if_then_else_statement
+terminal SWITCH; // switch_statement
+terminal CASE, DEFAULT; // switch_label
+terminal DO, WHILE; // while_statement, do_statement
+terminal FOR; // for_statement
+terminal BREAK; // break_statement
+terminal CONTINUE; // continue_statement
+terminal RETURN; // return_statement
+terminal THROW; // throw_statement
+terminal TRY; // try_statement
+terminal CATCH; // catch_clause
+terminal FINALLY; // finally
+terminal NEW; // class_instance_creation_expression
+terminal PLUSPLUS; // postincrement_expression
+terminal MINUSMINUS; // postdecrement_expression
+terminal PLUS, MINUS, COMP, NOT, DIV, MOD;
+terminal LSHIFT, RSHIFT, URSHIFT; // shift_expression
+terminal LT, GT, LTEQ, GTEQ, INSTANCEOF; // relational_expression
+terminal EQEQ, NOTEQ; // equality_expression
+terminal AND; // and_expression
+terminal XOR; // exclusive_or_expression
+terminal OR;  // inclusive_or_expression
+terminal ANDAND; // conditional_and_expression
+terminal OROR; // conditional_or_expression
+terminal QUESTION; // conditional_expression
+terminal MULTEQ, DIVEQ, MODEQ, PLUSEQ, MINUSEQ; // assignment_operator
+terminal LSHIFTEQ, RSHIFTEQ, URSHIFTEQ; // assignment_operator
+terminal ANDEQ, XOREQ, OREQ; // assignment_operator
+
+terminal java.lang.Number INTEGER_LITERAL;
+terminal java.lang.Number FLOATING_POINT_LITERAL;
+terminal java.lang.Boolean BOOLEAN_LITERAL;
+terminal java.lang.Character character; //ok
+terminal java.lang.String STRING_LITERAL;
+terminal java.lang.String CHARLITERAL;
+terminal java.lang.String identifier; // ok
+terminal NULL_LITERAL;
+
+// Reserved but unused:
+terminal CONST, GOTO;
+
+// 19.2) The Syntactic Grammar
+non terminal goal;
+
+// 19.3) Lexical Structure
+non terminal literal;
+
+// 19.4) Types, Values, and Variables
+non terminal type, primitive_type, numeric_type;
+non terminal integral_type, floating_point_type;
+non terminal reference_type;
+non terminal class_or_interface_type;
+non terminal class_type, interface_type;
+non terminal array_type;
+non terminal type_specifier; //ok
+non terminal arglist; //ok
+
+
+// 19.5) Names
+non terminal name, simple_name, qualified_name;
+
+// 19.6) Packages
+non terminal compilation_unit;
+non terminal package_declaration_opt, package_declaration;
+non terminal package_statement_opt; // ok
+non terminal import_declarations_opt, import_declarations;
+non terminal type_declarations_opt, type_declarations;
+non terminal import_declaration;
+non terminal single_type_import_declaration;
+non terminal type_import_on_demand_declaration;
+non terminal type_declaration;
+
+// 19.7) Productions used only in the LALR(1) grammar
+non terminal modifiers_opt, modifiers, modifier;
+
+// 19.8.1) Class Declaration
+non terminal class_name;  //ok
+non terminal class_declaration, super_cl, super_opt;
+non terminal interfaces, interfaces_opt, interface_type_list;
+non terminal class_body;
+non terminal class_body_declarations, class_body_declarations_opt;
+non terminal class_body_declaration, class_member_declaration;
+non terminal extends_class_opt;
+
+// 19.8.2) Field Declarations
+non terminal field_declaration; //ok
+non terminal variable_declaration; // ok
+non terminal variable_declarators, variable_declarator;
+non terminal variable_declarator_id, variable_initializer;
+
+// 19.8.3) Method Declarations
+non terminal method_declaration, method_header, method_declarator;
+non terminal formal_parameter_list_opt, formal_parameter_list;
+non terminal formal_parameter;
+non terminal throws_opt, throws;
+non terminal class_type_list, method_body;
+
+// 19.8.4) Static Initializers
+non terminal static_initializer;
+
+// 19.8.5) Constructor Declarations
+non terminal constructor_declaration; // ok
+non terminal constructor_body;
+non terminal explicit_constructor_invocation;
+
+// 19.9.1) Interface Declarations
+non terminal interface_type_list, interfaces, interface_opt // ok
+non terminal interface_name; //ok
+non terminal interface_declaration;
+non terminal extends_interfaces_opt, extends_interfaces;
+non terminal interface_body;
+non terminal interface_member_declarations_opt, interface_member_declarations;
+non terminal interface_member_declaration, constant_declaration;
+non terminal abstract_method_declaration;
+
+// 19.10) Arrays
+non terminal array_initializer;
+non terminal variable_initializers;
+
+// 19.11) Blocks and Statements
+non terminal block;
+non terminal block_statements_opt, block_statements, block_statement;
+non terminal local_variable_declaration_statement, local_variable_declaration;
+non terminal statement; //ok
+non terminal statement_no_short_if;
+non terminal statement_without_trailing_substatement;
+non terminal empty_statement;
+non terminal labeled_statement, labeled_statement_no_short_if;
+non terminal expression_statement, statement_expression;
+non terminal if_statement; //ok
+non terminal if_then_else_statement, if_then_else_statement_no_short_if;
+non terminal switch_statement, switch_block;
+non terminal switch_block_statement_groups;
+non terminal switch_block_statement_group;
+non terminal switch_labels, switch_label;
+non terminal while_statement, while_statement_no_short_if;
+non terminal do_statement; //ok
+non terminal for_statement; // ok
+non terminal for_statement_no_short_if;
+non terminal for_init_opt, for_init;
+non terminal for_update_opt, for_update;
+non terminal statement_expression_list;
+non terminal identifier_opt;
+non terminal break_statement, continue_statement;
+non terminal return_statement, throw_statement;
+non terminal synchronized_statement, try_statement;
+non terminal catches_opt, catches, catch_clause;
+non terminal finally;
+
+// 19.12) Expressions
+non terminal primary, primary_no_new_array;
+non terminal class_instance_creation_expression;
+non terminal argument_list_opt, argument_list;
+non terminal array_creation_expression;
+non terminal dim_exprs, dim_expr, dims_opt, dims;
+non terminal field_access, method_invocation, array_access;
+non terminal postfix_expression;
+non terminal postincrement_expression, postdecrement_expression;
+non terminal unary_expression, unary_expression_not_plus_minus;
+non terminal preincrement_expression, predecrement_expression;
+non terminal cast_expression;
+non terminal multiplicative_expression, additive_expression;
+non terminal shift_expression, relational_expression, equality_expression;
+non terminal and_expression, exclusive_or_expression, inclusive_or_expression;
+non terminal conditional_and_expression, conditional_or_expression;
+non terminal conditional_expression, assignment_expression;
+non terminal assignment;
+non terminal left_hand_side;
+non terminal assignment_operator;
+non terminal expression_opt, expression;
+non terminal constant_expression;
+non terminal bit_expression; //ok
+non terminal casting_expression; //ok
+non terminal creating_expression; // ok
+non terminal numeric_expression; // ok
+non terminal testing_expression; // ok
+non terminal logical_expression; // ok
+non terminal string_expression; // ok
+
+expression ::= 
+      | identifier 
+      | LPAREN expression RPAREN  
+      | expression LPAREN arglist_opt RPAREN 
+      | expression LBRACK expression RBRACK 
+      | expression DOT expression 
+      | expression COMMA expression 
+      | expression INSTANCEOF class_or_interface_name 
+	;
+
+//Aux
+non terminal exponent_part;
+
+start with goal;
+
+// 19.2) The Syntactic Grammar
+goal ::=	compilation_unit
+	;
 //RULES
 
 arglist ::= 
@@ -18,25 +255,27 @@ casting_expression ::=
      ; 
      
 extends_class_opt ::= | EXTENDS class_name ;
-interface_opt ::= | interfaces ;
-interfaces ::=	IMPLEMENTS interface_type_list
-	;
-interface_type_list ::= 
-		interface_type
-	|	interface_type_list COMMA interface_type
-	;
+
+interface_type_list ::= interface_type | interface_type_list COMMA interface_type; //ok
+interfaces ::=	IMPLEMENTS interface_type_list; //ok
+interface_opt ::= | interfaces ; //ok
+
 class_declaration ::= 
-       modifier CLASS identifier 
+      modifier CLASS identifier 
       extends_class_opt
-      implements_interface_opt
-      LBRACE field_declaration RBRACE 
+      interface_opt
+      LBRACE field_declaration RBRACE
       ;
 
-class_name ::= 
+class_or_interface_name ::= 
       identifier 
       | package_name DOT identifier 
      ;
      
+class_name ::= class_or_interface_name;
+
+interface_name ::= class_or_interface_name;
+
 package_statement_opt ::= | package_statement;
 compilation_unit ::= 
       package_statement_opt
@@ -61,7 +300,7 @@ do_statement ::=
 	;
 	
 arglist_opt ::= | arglist ;
-class_or_interface ::= class_name | interface_name ;
+class_or_interface_name ::= class_name | interface_name ;
 expression ::= 
       numeric_expression 
       | testing_expression 
@@ -80,7 +319,7 @@ expression ::=
       | expression LBRACK expression RBRACK 
       | expression DOT expression 
       | expression COMMA expression 
-      | expression INSTANCEOF class_or_interface 
+      | expression INSTANCEOF class_or_interface_name 
 	;
 	
 types_declarations ::= 
@@ -97,6 +336,7 @@ field_declaration ::=
 
 expression_opt ::= | expression ;
 expression_semicolon ::= expression SEMICOLON ;
+
 part_for ::= variable_declaration | expression_semicolon | SEMICOLON ;
 for_statement ::= 
       FOR LPAREN  
@@ -327,3 +567,10 @@ variable_initializer ::=
 while_statement ::=
 		WHILE LPAREN expression RPAREN statement
 	;
+	
+	
+//Auxs
+//exponent_part  ::=  "e" [ "+" | "-" ] decimal_digits 
+	
+// nao fiz decimal_digits, doc_comment, exponent_part, identifier, float_literal, float_type_suffix
+// field_declaration  ta estranho, refzer
