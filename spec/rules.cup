@@ -21,24 +21,21 @@ terminal BYTE, SHORT, INT, LONG, CHAR; // OK
 terminal D, E, F, X, L; // 
 terminal TRUE, FALSE; //  
 terminal NULL; // ok
-terminal THREADSAFE; //
 terminal FLOAT, DOUBLE; // 
 terminal LBRACK, RBRACK; // 
 terminal DOT; // 
 terminal SEMICOLON, MULT, COMMA, LBRACE, RBRACE, EQ, LPAREN, RPAREN, COLON;
 terminal PACKAGE; //
-terminal IMPORT; // 
-terminal PUBLIC, PROTECTED, PRIVATE; // 
-terminal STATIC; // 
-terminal ABSTRACT, FINAL, NATIVE, SYNCHRONIZED, TRANSIENT, VOLATILE;
-terminal CLASS; // 
-terminal EXTENDS; // 
-terminal IMPLEMENTS; // interfaces
+terminal IMPORT; // ok
+terminal PUBLIC, PROTECTED, PRIVATE, STATIC, ABSTRACT, FINAL, NATIVE, SYNCHRONIZED, TRANSIENT, THREADSAFE; //OK
+terminal CLASS; // ok
+terminal EXTENDS; // ok
+terminal IMPLEMENTS; // ok
 terminal VOID; // method_header
 terminal THROWS; // throws
 terminal THIS, SUPER; // ok
-terminal INTERFACE; // interface_declaration
-terminal IF, ELSE; // if_then_statement, if_then_else_statement
+terminal INTERFACE; // ok
+terminal IF, ELSE; // ok
 terminal SWITCH; // switch_statement
 terminal CASE, DEFAULT; // switch_label
 terminal DO, WHILE; // while_statement, do_statement
@@ -51,21 +48,19 @@ terminal TRY; // try_statement
 terminal CATCH; // catch_clause
 terminal FINALLY; // finally
 terminal NEW; // class_instance_creation_expression
-terminal PLUSPLUS; // postincrement_expression
-terminal MINUSMINUS; // postdecrement_expression
-terminal PLUS, MINUS, COMP, NOT, DIV, MOD;
-terminal LSHIFT, RSHIFT, URSHIFT; // shift_expression
-terminal LT, GT, LTEQ, GTEQ, INSTANCEOF; // relational_expression
-terminal EQEQ, NOTEQ; // equality_expression
-terminal AND; // and_expression
-terminal XOR; // exclusive_or_expression
-terminal OR;  // inclusive_or_expression
-terminal ANDAND; // conditional_and_expression
-terminal OROR; // conditional_or_expression
-terminal QUESTION; // conditional_expression
-terminal MULTEQ, DIVEQ, MODEQ, PLUSEQ, MINUSEQ; // assignment_operator
-terminal LSHIFTEQ, RSHIFTEQ, URSHIFTEQ; // assignment_operator
-terminal ANDEQ, XOREQ, OREQ; // assignment_operator
+terminal PLUS, MINUS, COMP, NOT, DIV, MOD, PLUSPLUS, MINUSMINUS; //ok
+terminal LSHIFT, RSHIFT, URSHIFT, RSHIFTEQ; // ok
+terminal LT, GT, LTEQ, GTEQ, EQEQ, NOTEQ, INSTANCEOF; // ok
+terminal AND, XOR, OR;  // ok
+terminal ANDAND,  OROR; // ok
+terminal ANDEQ, XOREQ, OREQ; // ok
+terminal MULTEQ, DIVEQ, MODEQ, PLUSEQ, MINUSEQ, QUESTION, RSHIFTEQ; // ok
+terminal LSHIFTEQ, URSHIFTEQ; // 
+
+logical_expression ::= 
+       NOT expression 
+      | expression MOD expression
+      | expression QUESTION expression COLON expression
 
 terminal java.lang.Number INTEGER_LITERAL;
 terminal java.lang.Number FLOATING_POINT_LITERAL;
@@ -86,7 +81,8 @@ non terminal goal;
 non terminal literal;
 
 // 19.4) Types, Values, and Variables
-non terminal type, primitive_type, numeric_type;
+non terminal type; // ok
+non terminal primitive_type, numeric_type;
 non terminal integral_type, floating_point_type;
 non terminal reference_type;
 non terminal class_or_interface_type;
@@ -100,9 +96,12 @@ non terminal arglist; //ok
 non terminal name, simple_name, qualified_name;
 
 // 19.6) Packages
-non terminal compilation_unit;
-non terminal package_declaration_opt, package_declaration;
+non terminal compilation_unit; //ok
+non terminal package_name; //ok
 non terminal package_statement_opt; // ok
+non terminal package_statement; //ok
+non terminal import_statement; //ok
+non terminal package_declaration_opt, package_declaration;
 non terminal import_declarations_opt, import_declarations;
 non terminal type_declarations_opt, type_declarations;
 non terminal import_declaration;
@@ -115,8 +114,8 @@ non terminal modifiers_opt, modifiers, modifier;
 
 // 19.8.1) Class Declaration
 non terminal class_name;  //ok
-non terminal class_declaration, super_cl, super_opt;
-non terminal interfaces, interfaces_opt, interface_type_list;
+non terminal class_or_interface_declaration, class_declaration; //ok
+non terminal super_cl, super_opt;
 non terminal class_body;
 non terminal class_body_declarations, class_body_declarations_opt;
 non terminal class_body_declaration, class_member_declaration;
@@ -134,9 +133,10 @@ non terminal formal_parameter_list_opt, formal_parameter_list;
 non terminal formal_parameter;
 non terminal throws_opt, throws;
 non terminal class_type_list, method_body;
+non terminal parameter_list, parameter_list_opt; //ok
 
 // 19.8.4) Static Initializers
-non terminal static_initializer;
+non terminal static_initializer; //ok
 
 // 19.8.5) Constructor Declarations
 non terminal constructor_declaration; // ok
@@ -146,7 +146,7 @@ non terminal explicit_constructor_invocation;
 // 19.9.1) Interface Declarations
 non terminal interface_type_list, interfaces, interface_opt // ok
 non terminal interface_name; //ok
-non terminal interface_declaration;
+non terminal interface_declaration; // ok
 non terminal extends_interfaces_opt, extends_interfaces;
 non terminal interface_body;
 non terminal interface_member_declarations_opt, interface_member_declarations;
@@ -161,29 +161,29 @@ non terminal variable_initializers;
 non terminal block;
 non terminal block_statements_opt, block_statements, block_statement;
 non terminal local_variable_declaration_statement, local_variable_declaration;
-non terminal statement; //ok
+non terminal statement, statement_block; //ok
 non terminal statement_no_short_if;
 non terminal statement_without_trailing_substatement;
 non terminal empty_statement;
 non terminal labeled_statement, labeled_statement_no_short_if;
 non terminal expression_statement, statement_expression;
 non terminal if_statement; //ok
+non terminal else_opt; //ok
 non terminal if_then_else_statement, if_then_else_statement_no_short_if;
-non terminal switch_statement, switch_block;
+non terminal switch_statement; // ok
+//, switch_block;
 non terminal switch_block_statement_groups;
 non terminal switch_block_statement_group;
 non terminal switch_labels, switch_label;
-non terminal while_statement, while_statement_no_short_if;
+non terminal while_statement_no_short_if;
 non terminal do_statement; //ok
-non terminal for_statement; // ok
-non terminal for_statement_no_short_if;
-non terminal for_init_opt, for_init;
-non terminal for_update_opt, for_update;
+non terminal for_statement, while_statement, try_statement; // ok
+non terminal finally_opt; //ok
 non terminal statement_expression_list;
-non terminal identifier_opt;
+non terminal identifier_opt; //ok
 non terminal break_statement, continue_statement;
 non terminal return_statement, throw_statement;
-non terminal synchronized_statement, try_statement;
+non terminal synchronized_statement;
 non terminal catches_opt, catches, catch_clause;
 non terminal finally;
 
@@ -207,7 +207,7 @@ non terminal conditional_expression, assignment_expression;
 non terminal assignment;
 non terminal left_hand_side;
 non terminal assignment_operator;
-non terminal expression_opt, expression;
+non terminal expression_opt, expression; //ok
 non terminal constant_expression;
 non terminal bit_expression; //ok
 non terminal casting_expression; //ok
@@ -215,7 +215,7 @@ non terminal creating_expression; // ok
 non terminal numeric_expression; // ok
 non terminal testing_expression; // ok
 non terminal logical_expression; // ok
-non terminal string_expression; // ok
+non terminal string_expression, string_op; // ok
 
 expression ::= 
       | identifier 
@@ -224,11 +224,15 @@ expression ::=
       | expression LBRACK expression RBRACK 
       | expression DOT expression 
       | expression COMMA expression 
-      | expression INSTANCEOF class_or_interface_name 
-	;
+      | expression INSTANCEOF class_or_interface_name ;
+      
+modifier  ::=  PUBLIC   | PRIVATE   | PROTECTED   | STATIC  | FINAL 
+      | NATIVE    | SYNCHRONIZED    | ABSTRACT  | THREADSAFE   | TRANSIENT ;
 
 //Aux
-non terminal exponent_part;
+non terminal exponent_part, doc_comment_opt;
+non terminal sttm_block_semicolon; //ok
+non terminal minus_exp, minusminus_exp, plusplus_exp, exp_minusminus, exp_plusplus; //ok
 
 start with goal;
 
@@ -386,12 +390,9 @@ interface_name ::=
       |  package_name DOT identifier
 	;
 
-literal_expression ::= 
-      INTEGER_LITERAL 
-      | FLOAT_LITERAL 
+literal_expression ::=   INTEGER_LITERAL  | FLOAT_LITERAL 
       | string               //VEEER
-      | character 
-	;
+      | character ; //ok
 	
 logical_expression ::= 
        NOT expression 
@@ -408,21 +409,21 @@ logical_expression ::=
       | expression QUESTION expression COLON expression
       | TRUE 
       | FALSE 
-	;
+	; //ok
 
-parameter_list_opt ::= | parameter_list;
-sttm_block_semicolon ::= statement_block | SEMICOLON ;
+parameter_list_opt ::= | parameter_list; //ok
+sttm_block_semicolon ::= statement_block | SEMICOLON ; //ok
 method_declaration ::= 
 		modifier type identifier 
 		LPAREN parameter_list_opt RPAREN LBRACK RBRACK
 		sttm_block_semicolon
-	;
-	
-minus_exp ::=  MINUS expression;
-minusminus_exp ::=  MINUSMINUS expression;
-plusplus_exp ::=  PLUSPLUS expression;
-exp_minusminus ::=   expression MINUSMINUS;
-exp_plusplus ::=   expression PLUSPLUS;
+	; //estranhissimo ok
+
+minus_exp ::=  MINUS expression; //ok
+minusminus_exp ::=  MINUSMINUS expression; //ok
+plusplus_exp ::=  PLUSPLUS expression; //ok
+exp_minusminus ::=   expression MINUSMINUS; //ok
+exp_plusplus ::=   expression PLUSPLUS; //ok
 
 numeric_expression ::= 
       minus_exp
@@ -440,7 +441,7 @@ numeric_expression ::=
       | expression DIVEQ expression
       | expression MOD expression 
       | expression MODEQ expression  
-	;
+	; //ok
 	
 package_name ::= 
       identifier 
@@ -449,15 +450,16 @@ package_name ::=
 	
 package_statement ::= 
       PACKAGE package_name SEMICOLON
-     ;
-     
+     ; //ok
+
 parameter ::= 
-      type identifier LBRACK RBRACK 
-	;  
+      type identifier LBRACK RBRACK |
+      type identifier
+	;  //ok
 	
-parameter_list ::= 
-      parameter COMMA parameter 
-	;
+parameter_list ::= parameter |
+      parameter COMMA parameter_list 
+	; //ok
 	
 identifier_opt ::= | identifier
 	;
@@ -486,46 +488,40 @@ statement_block  ::=
 	;
 
 static_initializer ::=
-		static statement_block 
+		STATIC statement_block 
 	;
 
-string_expression ::= 
-		expression 
-        PLUS 
-      	| PLUSEQ  
-      expression  
-    ;
+string_op ::= PLUS | PLUSEQ ;
+
+string_expression ::= expression string_op  expression;
+
+case_opt ::= | CASE expression COLON;
+    
+switch_body ::= default COLON | statement;
 
 switch_statement ::=
-	    switch LPAREN expression RPAREN LBRACE
-		 case expression COLON
-		| default COLON
-		| statment
-		RBRACE
-	;
+        switch LPAREN expression RPAREN LBRACE 
+        case_opt switch_body RBRACE;
+        
+//switch_statement   ::=  "switch" "(" expression ")" "{"   { ( "case" expression ":" )| ( "default" ":" )  | statement }  "}" 
 
 testing_expression ::= 
-       expression 
-       GT
-      | LT 
-      | GTEQ
-      | LTEQ 
-      | EQEQ 
-      | NOTEQ
-      expression  
-    ; 
+     expression GT expression
+     | expression LT expression
+     | expression GTEQ expression
+     | expression LTEQ expression
+     | expression EQEQ expression
+     | expression NOTEQ expression;
       
-finally_opt ::= | FINALLY statement 
-	;
+finally_opt ::= | FINALLY statement;
 try_statement ::=
-		TRY statement
-		CATCH LPAREN parameter RPAREN statement 
-      	finally_opt
-	;
+		TRY statement LBRACE CATCH LPAREN parameter RPAREN statement RBRACE
+      	finally_opt;
 
 type ::= 
-      type_specifier LBRACK RBRACK
-     ;
+      type_specifier
+      | type_specifier LBRACK RBRACK;
+      
 doc_comment_opt ::= | doc_comment ;
 class_or_interface_declaration ::= class_declaration | interface_declaration;
 type_declaration ::= 
@@ -558,7 +554,7 @@ comma_opt ::= | COMMA
 	;
 variable_initializer_opt ::= | variable_initializer 
       COMMA variable_initializer comma_opt 
-
+;
 variable_initializer ::=
 		expression
 	|	LBRACE variable_initializer_opt   RBRACE
@@ -572,5 +568,6 @@ while_statement ::=
 //Auxs
 //exponent_part  ::=  "e" [ "+" | "-" ] decimal_digits 
 	
-// nao fiz decimal_digits, doc_comment, exponent_part, identifier, float_literal, float_type_suffix
+// nao fiz decimal_digits, doc_comment, exponent_part, identifier, float_literal, float_type_suffix, STRING
+// integer_literal
 // field_declaration  ta estranho, refzer
