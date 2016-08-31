@@ -1,4 +1,5 @@
 package compiler.generated;
+import java_cup.*;
 import java_cup.runtime.*;
 import compiler.core.*;
 
@@ -44,11 +45,26 @@ Identifier = [:jletter:][:jletterdigit:]*
 LineTerminator = \r|\n|\r\n
 WhiteSpace = {LineTerminator} | [ \t\f]
 
-/* numeric */
-IntegerLiteral = 0 | [1-9][0-9]*
+/* integer literals */
+DecIntegerLiteral = 0 | [1-9][0-9]*
+DecLongLiteral    = {DecIntegerLiteral} [lL]
+
+HexIntegerLiteral = 0 [xX] 0* {HexDigit} {1,8}
+HexLongLiteral    = 0 [xX] 0* {HexDigit} {1,16} [lL]
+HexDigit          = [0-9a-fA-F]
+
+OctIntegerLiteral = 0+ [1-3]? {OctDigit} {1,15}
+OctLongLiteral    = 0+ 1? {OctDigit} {1,21} [lL]
+OctDigit          = [0-7]
 
 /* floats */
-FloatLiteral = {IntegerLiteral}"."{IntegerLiteral}
+FloatLiteral  = ({FLit1}|{FLit2}|{FLit3}) {Exponent}? [fF]
+DoubleLiteral = ({FLit1}|{FLit2}|{FLit3}) {Exponent}?
+
+FLit1    = [0-9]+ \. [0-9]* 
+FLit2    = \. [0-9]+ 
+FLit3    = [0-9]+ 
+Exponent = [eE] [+-]? [0-9]+
 
 /* strings */
 Marker = [\"]
@@ -58,8 +74,12 @@ Alphanumerics_ = [ a-zA-Z0-9_]
 
 temp = [ \*|\+|\[|\]|\!|\£|\$|\%|\&|\=|\?|\^|\-|\°|\#|\@|\:|\(|\)|\"|\r|\n|\r\n\t\f a-zA-Z0-9_]*
 
-StringLiteral = {Marker}   {temp}   {Marker}
-StringContent =  {Alphanumerics_}*StringContent | {Other_Symbols}*StringContent | {Separators}*StringContent /*Fixme: Doesn't work, it obtains stack overflow*/
+/* string and character literals */
+StringCharacter = [^\r\n\"\\]
+SingleCharacter = [^\r\n\'\\]
+
+%state STRING, CHARLITERAL
+
 
 /* comments */
 Comment = "/**" ( [^*] | \*+ [^/*] )* "*"+ "/"
@@ -83,7 +103,6 @@ Comment = "/**" ( [^*] | \*+ [^/*] )* "*"+ "/"
   "double"                       { return symbol(sym.DOUBLE); }
   "else"                         { return symbol(sym.ELSE); }
   "extends"                      { return symbol(sym.EXTENDS); }
-  "false"						 { return symbol(sym.FALSE);}
   "final"                        { return symbol(sym.FINAL); }
   "finally"                      { return symbol(sym.FINALLY); }
   "float"                        { return symbol(sym.FLOAT); }
@@ -97,7 +116,7 @@ Comment = "/**" ( [^*] | \*+ [^/*] )* "*"+ "/"
   "long"                         { return symbol(sym.LONG); }
   "native"                       { return symbol(sym.NATIVE); }
   "new"                          { return symbol(sym.NEW); }
-  "null"                         { return symbol(sym.NULL); }
+  "null"                         { return symbol(sym.NULL_LITERAL); }
   "package"                      { return symbol(sym.PACKAGE); }
   "private"                      { return symbol(sym.PRIVATE); }
   "protected"                    { return symbol(sym.PROTECTED); }
@@ -112,31 +131,32 @@ Comment = "/**" ( [^*] | \*+ [^/*] )* "*"+ "/"
   "threadsafe"					 { return symbol(sym.THREADSAFE);}
   "throw"                        { return symbol(sym.THROW); }
   "transient"                    { return symbol(sym.TRANSIENT); }
-  "true"						 { return symbol(sym.TRUE);}
   "try"                          { return symbol(sym.TRY); }
   "void"                         { return symbol(sym.VOID); }
   "while"                        { return symbol(sym.WHILE); }
   
-  /* check how to consider those later
-  "x"							 { return symbol(sym.X);}
-  "d"							 { return symbol(sym.D);}
-  "e"							 { return symbol(sym.E);}
-  "f"							 { return symbol(sym.F);}
-  "l"							 { return symbol(sym.L);}
-  */
+  
+/* boolean literals*/
+  "true"                         { return symbol(sym.BOOLEAN_LITERAL, new Boolean(true)); }
+  "false"                        { return symbol(sym.BOOLEAN_LITERAL, new Boolean(false)); }
+    
        
 /* Identifier*/
   {Identifier} 					 { return symbol(sym.IDENTIFIER,yytext());}
 
-/* Float literals */  
-  {FloatLiteral} 				 { return symbol(sym.FLOATING_POINT_LITERAL, new String(yytext()));}
-
-/* Integer literals */  
-  {IntegerLiteral}               { return symbol(sym.INTEGER_LITERAL, new String(yytext()));}
-
-/* character literal */
-  \'                             { return symbol(sym.CHARACTER_LITERAL); }
+  {DecIntegerLiteral}            { return symbol(sym.INTEGER_LITERAL, new Integer(yytext())); }
+  {DecLongLiteral}               { return symbol(sym.INTEGER_LITERAL, new Long(yytext().substring(0,yylength()-1))); }
   
+  {HexIntegerLiteral}            { return symbol(sym.INTEGER_LITERAL, new Integer((int) parseLong(2, yylength(), 16))); }
+  {HexLongLiteral}               { return symbol(sym.INTEGER_LITERAL, new Long(parseLong(2, yylength()-1, 16))); }
+ 
+  {OctIntegerLiteral}            { return symbol(sym.INTEGER_LITERAL, new Integer((int) parseLong(0, yylength(), 8))); }  
+  {OctLongLiteral}               { return symbol(sym.INTEGER_LITERAL, new Long(parseLong(0, yylength()-1, 8))); }
+  
+  {FloatLiteral}                 { return symbol(sym.FLOATING_POINT_LITERAL, new Float(yytext().substring(0,yylength()-1))); }
+  {DoubleLiteral}                { return symbol(sym.FLOATING_POINT_LITERAL, new Double(yytext())); }
+  {DoubleLiteral}[dD]            { return symbol(sym.FLOATING_POINT_LITERAL, new Double(yytext().substring(0,yylength()-1))); }
+
 /* Comments*/
   {Comment}                      { /* just ignore it */ }
   
@@ -151,8 +171,12 @@ Comment = "/**" ( [^*] | \*+ [^/*] )* "*"+ "/"
   ","                            { return symbol(sym.COMMA); }
   "."   		  				 { return symbol(sym.DOT); }
   
- /* TODO string literal */
-  {StringLiteral}                { return symbol(sym.STRING_LITERAL,new String(yytext())); }
+/* string literal */
+  \"                             { yybegin(STRING); string.setLength(0); }
+
+  /* character literal */
+  \'                             { yybegin(CHARLITERAL); }
+
   
  /* White spaces */
   {WhiteSpace}					 { /* just ignore it*/}
@@ -204,3 +228,49 @@ Comment = "/**" ( [^*] | \*+ [^/*] )* "*"+ "/"
  "?"                             { return symbol(sym.QUESTION); }
  
  }
+ 
+ <STRING> {
+  \"                             { yybegin(YYINITIAL); return symbol(sym.STRING_LITERAL, string.toString()); }
+  
+  {StringCharacter}+             { string.append( yytext() ); }
+  
+  /* escape sequences */
+  "\\b"                          { string.append( '\b' ); }
+  "\\t"                          { string.append( '\t' ); }
+  "\\n"                          { string.append( '\n' ); }
+  "\\f"                          { string.append( '\f' ); }
+  "\\r"                          { string.append( '\r' ); }
+  "\\\""                         { string.append( '\"' ); }
+  "\\'"                          { string.append( '\'' ); }
+  "\\\\"                         { string.append( '\\' ); }
+  \\[0-3]?{OctDigit}?{OctDigit}  { char val = (char) Integer.parseInt(yytext().substring(1),8);
+                        				   string.append( val ); }
+  
+  /* error cases */
+  \\.                            { throw new RuntimeException("Illegal escape sequence \""+yytext()+"\""); }
+  {LineTerminator}               { throw new RuntimeException("Unterminated string at end of line"); }
+}
+
+<CHARLITERAL> {
+  {SingleCharacter}\'            { yybegin(YYINITIAL); return symbol(sym.CHARACTER_LITERAL, new Character(yytext().charAt(0))); }
+  
+  /* escape sequences */
+  "\\b"\'                        { yybegin(YYINITIAL); return symbol(sym.CHARACTER_LITERAL, new Character('\b'));}
+  "\\t"\'                        { yybegin(YYINITIAL); return symbol(sym.CHARACTER_LITERAL, new Character('\t'));}
+  "\\n"\'                        { yybegin(YYINITIAL); return symbol(sym.CHARACTER_LITERAL, new Character('\n'));}
+  "\\f"\'                        { yybegin(YYINITIAL); return symbol(sym.CHARACTER_LITERAL, new Character('\f'));}
+  "\\r"\'                        { yybegin(YYINITIAL); return symbol(sym.CHARACTER_LITERAL, new Character('\r'));}
+  "\\\""\'                       { yybegin(YYINITIAL); return symbol(sym.CHARACTER_LITERAL, new Character('\"'));}
+  "\\'"\'                        { yybegin(YYINITIAL); return symbol(sym.CHARACTER_LITERAL, new Character('\''));}
+  "\\\\"\'                       { yybegin(YYINITIAL); return symbol(sym.CHARACTER_LITERAL, new Character('\\')); }
+  \\[0-3]?{OctDigit}?{OctDigit}\' { yybegin(YYINITIAL); 
+			                              int val = Integer.parseInt(yytext().substring(1,yylength()-1),8);
+			                            return symbol(sym.CHARACTER_LITERAL, new Character((char)val)); }
+  
+  /* error cases */
+  \\.                            { throw new RuntimeException("Illegal escape sequence \""+yytext()+"\""); }
+  {LineTerminator}               { throw new RuntimeException("Unterminated character literal at end of line"); }
+}
+ 
+ 
+ 
