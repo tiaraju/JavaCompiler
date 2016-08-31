@@ -10,7 +10,6 @@ import compiler.generated.Scanner;
 
 public class ParserTest {
 	
-	
 	public static void main(String[] args) {
 		String filePath = "examples/Test.java";
 		Scanner scanner = null;

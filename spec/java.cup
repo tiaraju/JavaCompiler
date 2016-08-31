@@ -167,6 +167,10 @@ non terminal eq_variable_initializer_opt;
 non terminal variable_comma_opt;
 non terminal variable_mult_comma;
 non terminal variable_initializer_opt;
+non terminal import_statement_opt;
+non terminal type_declaration_opt;
+non terminal modifiers_opt;
+non terminal modifiers;
 
 //RULES
 
@@ -174,14 +178,21 @@ package_statement_opt ::= | package_statement
 ;
 compilation_unit  ::= 
   package_statement_opt  
-  import_statement  
-  type_declaration 
+  import_statement_opt  
+  type_declaration_opt 
+;
+
+package_name ::= 
+	identifier 
+	|  package_name DOT identifier  
 ;
 
 package_statement  ::= 
   PACKAGE package_name SEMICOLON 
 ;
 
+import_statement_opt ::= | import_statement
+;
 import_statement  ::= 
  IMPORT package_name  DOT  MULT  SEMICOLON   
  |   class_name  | interface_name SEMICOLON 
@@ -189,11 +200,12 @@ import_statement  ::=
 
 doc_comment_opt ::= | doc_comment
 ;
+type_declaration_opt ::= | type_declaration
+;
 type_declaration  ::= 
   doc_comment_opt  class_declaration  | interface_declaration SEMICOLON 
 ;
 
-//TODO
 doc_comment  ::=  "/**" "*/" 
 ;
 
@@ -204,16 +216,11 @@ implements_opt ::= |  IMPLEMENTS interface_name implements_compl
 implements_compl ::=  | COMMA interface_name
 ;
 class_declaration  ::= 
- modifier CLASS identifier 
+ modifiers_opt CLASS identifier 
  extends_opt
  implements_opt  
  LBRACE   field_declaration   RBRACE
  ; 
- 
- package_name ::= 
-	identifier 
-	|  package_name DOT identifier  
-;
  
 interface_name ::= 
       identifier 
@@ -225,23 +232,22 @@ extends_interface_opt ::= | EXTENDS interface_name extends_mult_interface_opt
 extends_mult_interface_opt ::= |  COMMA interface_name
 ;
 interface_declaration ::= 
-       modifier  INTERFACE identifier 
+       modifiers_opt  INTERFACE identifier 
        extends_interface_opt
        LBRACE  field_declaration  RBRACE
 ;  
 
-modifier ::= 
-      PUBLIC 
-      | PRIVATE 
-      | PROTECTED 
-      | STATIC 
-      | FINAL 
-      | NATIVE 
-      | SYNCHRONIZED 
-      | ABSTRACT 
-      | THREADSAFE 
-      | TRANSIENT 
-;
+modifiers_opt::=
+	|	modifiers
+	;
+modifiers ::= 	modifier
+	|	modifiers modifier
+	;
+modifier ::=	PUBLIC | PROTECTED | PRIVATE
+	|	STATIC
+	|	ABSTRACT | FINAL | NATIVE | SYNCHRONIZED | TRANSIENT | VOLATILE
+	|THREADSAFE
+	;
 
 field_declaration ::= 
        doc_comment_opt   method_declaration 
@@ -254,18 +260,18 @@ field_declaration ::=
 parameter_list_opt ::= | parameter_list
 ;
 method_declaration ::= 
-      modifier  type identifier 
+      modifiers_opt  type identifier 
       LPAREN  parameter_list_opt  RPAREN  LBRACK RBRACK  
       statement_block | SEMICOLON  
 ;
 
 constructor_declaration ::= 
-      modifier identifier LPAREN  parameter_list_opt  RPAREN 
+      modifiers_opt identifier LPAREN  parameter_list_opt  RPAREN 
       statement_block 
 ;
 
 variable_declaration ::= 
-       modifier type variable_declarator 
+       modifiers_opt type variable_declarator 
        COMMA variable_declarator SEMICOLON 
 ;
 
@@ -303,6 +309,8 @@ parameter ::= type identifier LBRACK RBRACK
 ; 
 
 return_expression_opt ::= | expression
+;
+identifier ::= IDENTIFIER
 ;
 identifier_opt ::= | identifier
 ;
@@ -424,15 +432,13 @@ numeric_expression ::=
 ;
 
 testing_expression ::= 
-      expression 
-       GT 
-      | LT 
-      | GTEQ 
-      | LTEQ 
-      | EQEQ 
-      | NOTEQ ) 
-      expression
-; 
+     expression GT expression
+     | expression LT expression
+     | expression GTEQ expression
+     | expression LTEQ expression
+     | expression EQEQ expression
+     | expression NOTEQ expression
+;
 
 logical_expression ::= 
       NOT expression 
@@ -479,11 +485,13 @@ creating_expression ::=
       | LPAREN expression RPAREN 
 ;
 
-literal_expression ::= 
-      integer_literal 
-      | float_literal 
-      | string 
-      | character 
+literal_expression ::=	
+		INTEGER_LITERAL
+	|	FLOATING_POINT_LITERAL
+	|	BOOLEAN_LITERAL
+	|	CHARACTER_LITERAL
+	|	STRING_LITERAL
+	|	NULL_LITERAL
 ;
 
 arglist ::= expression  COMMA expression
