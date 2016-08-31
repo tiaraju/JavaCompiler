@@ -2,6 +2,7 @@ package examples;
 
 public class Test{
 
+	
 	public void begginTest(){
 		boolean a = true;
 	}

@@ -1,4 +1,6 @@
-package compiler.generated;
+package tests;
+
+import compiler.generated.Scanner;
 
 public class ScannerTest {
 
