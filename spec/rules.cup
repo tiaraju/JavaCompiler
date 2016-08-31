@@ -137,7 +137,28 @@ non terminal exponent_part, doc_comment_opt;
 non terminal sttm_block_semicolon; //ok
 non terminal minus_exp, minusminus_exp, plusplus_exp, exp_minusminus, exp_plusplus; //ok
 non terminal arglist_opt, class_or_interface_name; 
+non terminal interface_type;
+non terminal extends_class_opt;
+non terminal expression_bracks_opt;
+non terminal literal_expression;
+non terminal types_declarations;
+non terminal expression_semicolon;
+non terminal part_for;
+non terminal extends_interfaces_opt;
+non terminal interface_body;
+non terminal extends_interfaces;
+non terminal interface_member_declarations_opt;
+non terminal interface_member_declarations;
+non terminal parameter;
+non terminal case_opt;
+non terminal doc_comment;
+start with goal
+;
+goal ::= compilation_unit
+;
      
+//RULES
+
 modifier  ::=  PUBLIC   | PRIVATE   | PROTECTED   | STATIC  | FINAL 
       | NATIVE    | SYNCHRONIZED    | ABSTRACT  | THREADSAFE   | TRANSIENT ;
 
@@ -150,13 +171,6 @@ expression ::=
       | expression COMMA expression 
       | expression INSTANCEOF class_or_interface_name ;
 
-	
-start with goal;
-
-// 19.2) The Syntactic Grammar
-goal ::=	compilation_unit
-	;
-//RULES
 
 arglist ::= 
       expression
@@ -213,10 +227,10 @@ constructor_declaration ::=
      
 
 
-expression_bracks_opt ::= | LBRACK expression RLBRACK ;
+expression_bracks_opt ::= | LBRACK expression RBRACK ;
 creating_expression ::= 
-      NEW classe_name LPAREN arglist_opt RPAREN 
-      | NEW type_specifier expression_bracks_opt LBRACK RLBRACK 
+      NEW class_name LPAREN arglist_opt RPAREN 
+      | NEW type_specifier expression_bracks_opt LBRACK RBRACK 
       | NEW LPAREN expression RPAREN 
 	;
 	
@@ -313,8 +327,8 @@ interface_name ::=
       |  package_name DOT identifier
 	;
 
-literal_expression ::=   INTEGER_LITERAL  | FLOAT_LITERAL 
-      | string               //VEEER
+literal_expression ::=   INTEGER_LITERAL  | FLOATING_POINT_LITERAL 
+      | STRING_LITERAL               //VEEER
       | character ; //ok
 	
 logical_expression ::= 
@@ -420,10 +434,10 @@ string_expression ::= expression string_op  expression;
 
 case_opt ::= | CASE expression COLON;
     
-switch_body ::= default COLON | statement;
+switch_body ::= DEFAULT COLON | statement;
 
 switch_statement ::=
-        switch LPAREN expression RPAREN LBRACE 
+        SWITCH LPAREN expression RPAREN LBRACE 
         case_opt switch_body RBRACE;
         
 testing_expression ::= 
@@ -466,8 +480,8 @@ variable_declaration ::=
 
 variable_declarator_loop ::= variable_declarator | variable_declarator COMMA variable_declarator_loop ;
 variable_declarator ::=
-		identifier eq_variable_initializer_op
-		| identifier LBRACK RBRACK eq_variable_initializer_op
+		identifier eq_variable_initializer_opt
+		| identifier LBRACK RBRACK eq_variable_initializer_opt
 		| identifier LBRACK RBRACK;
 		
 variable_initializer ::=
@@ -484,3 +498,4 @@ variable_initializer_opt ::= variable_initializer | variable_initializer
 
 while_statement ::=
 		WHILE LPAREN expression RPAREN statement;
+	
