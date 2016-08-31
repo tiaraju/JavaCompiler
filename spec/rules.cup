@@ -56,12 +56,6 @@ terminal ANDAND,  OROR; // ok
 terminal ANDEQ, XOREQ, OREQ; // ok
 terminal MULTEQ, DIVEQ, MODEQ, PLUSEQ, MINUSEQ, QUESTION; // ok
 terminal LSHIFTEQ, URSHIFTEQ; // 
-
-logical_expression ::= 
-       NOT expression 
-      | expression MOD expression
-      | expression QUESTION expression COLON expression
-
 terminal java.lang.Number INTEGER_LITERAL;
 terminal java.lang.Number FLOATING_POINT_LITERAL;
 terminal java.lang.Boolean BOOLEAN_LITERAL;
@@ -70,6 +64,9 @@ terminal java.lang.String STRING_LITERAL;
 terminal java.lang.String CHARLITERAL;
 terminal java.lang.String identifier; // ok
 terminal NULL_LITERAL;
+
+
+
 
 // 19.2) The Syntactic Grammar
 non terminal goal;
@@ -99,7 +96,7 @@ non terminal class_or_interface_declaration, class_declaration; //ok
 non terminal field_declaration; //ok
 non terminal variable_declaration, variable_declarator, variable_declarator_loop; // ok
 non terminal comma_opt, variable_initializer, variable_initializer_opt, eq_variable_initializer_opt; //ok
-non terminal variable_declarator_id, variable_initializer; //ok
+non terminal variable_declarator_id; //ok
 
 // 19.8.3) Method Declarations
 non terminal method_declaration, parameter_list, parameter_list_opt; //ok
@@ -111,7 +108,7 @@ non terminal static_initializer; //ok
 non terminal constructor_declaration; // ok
 
 // 19.9.1) Interface Declarations
-non terminal interface_type_list, interfaces, interface_opt // ok
+non terminal interface_type_list, interfaces, interface_opt ;// ok
 non terminal interface_name; //ok
 non terminal interface_declaration; // ok
 
@@ -135,6 +132,28 @@ non terminal testing_expression; // ok
 non terminal logical_expression; // ok
 non terminal string_expression, string_op; // ok
 
+//Aux
+non terminal exponent_part, doc_comment_opt;
+non terminal sttm_block_semicolon; //ok
+non terminal minus_exp, minusminus_exp, plusplus_exp, exp_minusminus, exp_plusplus; //ok
+non terminal arglist_opt, class_or_interface_name; 
+non terminal interface_type;
+non terminal extends_class_opt;
+non terminal expression_bracks_opt;
+non terminal literal_expression;
+
+
+
+start with goal
+;
+goal ::= compilation_unit
+;
+     
+//RULES
+
+modifier  ::=  PUBLIC   | PRIVATE   | PROTECTED   | STATIC  | FINAL 
+      | NATIVE    | SYNCHRONIZED    | ABSTRACT  | THREADSAFE   | TRANSIENT ;
+
 expression ::= 
       | identifier 
       | LPAREN expression RPAREN  
@@ -143,26 +162,14 @@ expression ::=
       | expression DOT expression 
       | expression COMMA expression 
       | expression INSTANCEOF class_or_interface_name ;
-      
-modifier  ::=  PUBLIC   | PRIVATE   | PROTECTED   | STATIC  | FINAL 
-      | NATIVE    | SYNCHRONIZED    | ABSTRACT  | THREADSAFE   | TRANSIENT ;
 
-//Aux
-non terminal exponent_part, doc_comment_opt;
-non terminal sttm_block_semicolon; //ok
-non terminal minus_exp, minusminus_exp, plusplus_exp, exp_minusminus, exp_plusplus; //ok
-
-start with goal;
-
-// 19.2) The Syntactic Grammar
-goal ::=	compilation_unit
-	;
-//RULES
 
 arglist ::= 
       expression
       | arglist COMMA expression
      ;
+
+arglist_opt ::= | arglist ;
      
 bit_expression ::= 
       COMP expression 
@@ -210,10 +217,12 @@ constructor_declaration ::=
       statement_block 
      ;
      
-expression_bracks_opt ::= | LBRACK expression RLBRACK ;
+
+
+expression_bracks_opt ::= | LBRACK expression RBRACK ;
 creating_expression ::= 
-      NEW classe_name LPAREN arglist_opt RPAREN 
-      | NEW type_specifier expression_bracks_opt LBRACK RLBRACK 
+      NEW class_name LPAREN arglist_opt RPAREN 
+      | NEW type_specifier expression_bracks_opt LBRACK RBRACK 
       | NEW LPAREN expression RPAREN 
 	;
 	
@@ -221,7 +230,9 @@ do_statement ::=
 		DO statement WHILE LPAREN expression RPAREN SEMICOLON
 	;
 	
-arglist_opt ::= | arglist ;
+
+	
+
 class_or_interface_name ::= class_name | interface_name ;
 expression ::= 
       numeric_expression 
@@ -412,7 +423,7 @@ static_initializer ::=
 string_op ::= PLUS | PLUSEQ ;
 
 string_expression ::= expression string_op  expression;
-case_opt, switch_body
+
 case_opt ::= | CASE expression COLON;
     
 switch_body ::= default COLON | statement;
@@ -465,23 +476,18 @@ variable_declarator ::=
 		| identifier LBRACK RBRACK eq_variable_initializer_op
 		| identifier LBRACK RBRACK;
 		
+variable_initializer ::=
+		expression
+	|	LBRACE variable_initializer_opt comma_opt  RBRACE;
+			
 eq_variable_initializer_opt ::= | EQ variable_initializer ;
 		
 comma_opt ::= | COMMA;
 
 variable_initializer_opt ::= variable_initializer | variable_initializer 
       COMMA variable_initializer_opt  
- 
-variable_initializer ::=
-		expression
-	|	LBRACE variable_initializer_opt comma_opt  RBRACE;
-	
+ 	;
+
 while_statement ::=
 		WHILE LPAREN expression RPAREN statement;
 	
-//Auxs
-//exponent_part  ::=  "e" [ "+" | "-" ] decimal_digits 
-	
-// nao fiz decimal_digits, doc_comment, exponent_part, identifier, float_literal, float_type_suffix, STRING
-// integer_literal
-// field_declaration  ta estranho, refzer
