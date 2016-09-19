@@ -13,7 +13,7 @@ public class Test extends Main implements Serializable {
 	}
 
 	public void logicalOP() {
-        boolean t = true;
+        boolean t = (int) true;
         boolean f = false;
         boolean a = t && f || t != true || t == f && !f;
         boolean b = t ^ f;

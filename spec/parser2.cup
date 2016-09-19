@@ -1,4 +1,7 @@
 import java_cup.runtime.*;
+import compiler.core.*;
+import compiler.analysis.*;
+import compiler.util.*;
 
 parser code  {:
  public void report_error(String message, Object info) {
@@ -143,8 +146,16 @@ brack_loop ::= | brack brack_loop;
 
 type ::= type_specifier brack_loop;
 
-type_specifier ::= BOOLEAN | BYTE | CHAR | SHORT | INT | FLOAT | LONG
-    | DOUBLE | VOID | entity_name;
+type_specifier ::= BOOLEAN 
+| BYTE 		{:RESULT = new Type("byte"); Logger.print("BYTE at line 150");:} 
+| CHAR 		{:RESULT = new Type("char");Logger.print("CHAR at line 150");:}
+| SHORT		{:RESULT = new Type("short");Logger.print("SHORT at line 150");:}
+| INT		{:RESULT = new Type("int");Logger.print("INT at line 150");:}
+| FLOAT		{:RESULT = new Type("float");Logger.print("FLOAT at line 150");:}
+| LONG		{:RESULT = new Type("long");Logger.print("LONG at line 150");:}
+| DOUBLE 	{:RESULT = new Type("double");Logger.print("DOUBLE at line 150");:}
+| VOID 		{:RESULT = new Type("void");Logger.print("VOID at line 150");:}
+| entity_name;
 
 parameter ::= type IDENTIFIER brack_loop;
 

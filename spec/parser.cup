@@ -1,5 +1,7 @@
 import java_cup.runtime.*;
-
+import compiler.core.*;
+import compiler.analysis.*;
+import compiler.util.*;
 
 
 parser code  {: 
@@ -166,15 +168,15 @@ numeric_type::=	integral_type
 	|	floating_point_type
 	;
 integral_type ::= 
-		BYTE 
-	|	SHORT 
-	|	INT 
-	|	LONG 
-	|	CHAR 
+		BYTE  {:RESULT = new Type("byte"); Logger.print("BYTE at line 150");:} 
+	|	SHORT {:RESULT = new Type("short");Logger.print("SHORT at line 150");:}
+	|	INT {:RESULT = new Type("int");Logger.print("INT at line 150");:}
+	|	LONG  {:RESULT = new Type("long");Logger.print("LONG at line 150");:}
+	|	CHAR  {:RESULT = new Type("char");Logger.print("CHAR at line 150");:}
 	;
 floating_point_type ::= 
-		FLOAT 
-	|	DOUBLE
+		FLOAT  {:RESULT = new Type("float");Logger.print("FLOAT at line 150");:}
+	|	DOUBLE {:RESULT = new Type("double");Logger.print("DOUBLE at line 150");:}
 	;
 
 reference_type ::=
