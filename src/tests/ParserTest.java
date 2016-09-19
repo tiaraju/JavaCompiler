@@ -3,14 +3,16 @@ package tests;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
 
+import java_cup.parser;
 import java_cup.runtime.Symbol;
 import compiler.generated.Parser;
 import compiler.generated.Scanner;
 
 public class ParserTest {
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		String filePath = "examples/Test.java";
 		Scanner scanner = null;
 		try {
