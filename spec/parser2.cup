@@ -1,6 +1,7 @@
 import java_cup.runtime.*;
 import compiler.core.*;
 import compiler.analysis.*;
+import compiler.generator.*;
 import compiler.util.*;
 import java.util.ArrayList;
 
@@ -312,8 +313,9 @@ for_div_1 ::=
 numeric_expression ::= MINUS expression:e {: Logger.print("Line 298"); SemanticImpl.getInstance().isNumericExpression((Expression) e); RESULT = e;:}
                        | numeric_option expression:e {: Logger.print("Line 299"); SemanticImpl.getInstance().isNumericExpression((Expression) e); RESULT=e;:}
 					   | expression:e numeric_option:no {:Logger.print("Line 300, numeric_option:" + "  "); SemanticImpl.getInstance().isNumericExpression((Expression) e); RESULT=e;:}
-					   | expression:le middle_operator:md expression:re {:Logger.print("Linha 302 "); 
-					   													  SemanticImpl.getInstance().isNumericExpression((Expression) le,(Expression) re); 
+					   | expression:le middle_operator:md expression:re {:Logger.print("Linha 302 "+ md); 
+					   													  SemanticImpl.getInstance().isNumericExpression((Expression) le,(Expression) re);
+					   													  AssemblyGenerator.getInstance().generate((String) md, (Expression) le, (Expression) re); 
 					   													  RESULT = SemanticImpl.getInstance().getExpression((Expression) le, (String) md, (Expression) re);:}
 					   ;
 

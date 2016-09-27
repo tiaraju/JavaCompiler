@@ -41,4 +41,8 @@ public class Expression {
 	public String toString(){
 		return "Expression of type; " + getType();
 	}
+
+	public String getAssemblyValue() {
+		return this.value;
+	}
 }

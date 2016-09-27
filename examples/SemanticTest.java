@@ -3,8 +3,8 @@ public class SemanticTest{
 	
 	int a =10;
 
-	public String teste(){
-		String a = "aoisjd";
+	public int teste(){
+		int a = 10 + 10;
 		return a;
 	}
 	

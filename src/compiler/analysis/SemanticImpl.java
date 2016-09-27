@@ -115,10 +115,8 @@ public class SemanticImpl{
 	}
 
 	public void addFunctionAndNewScope(Function f) {
-		System.out.println(f.getName());
 		functions.add(f);
 		createNewScope(f);
-		System.out.println("Criou novo escopo");
 	}
 
 	public boolean checkVariableExistence(String variableName) {
@@ -169,7 +167,6 @@ public class SemanticImpl{
 	}
 	
 	public boolean checkTypeOfAssignment(Variable variable, Expression exp) throws InvalidTypeAssignmentException{
-		System.out.println(variable.getType());
 		if (!variable.getType().equals(exp.getType())){
 			throw new InvalidTypeAssignmentException("Alguma msg aqui");
 		}
@@ -226,7 +223,7 @@ public class SemanticImpl{
 	 */
 	private void addVariable(Variable variable) throws Exception{
 		for(String v : variables.keySet()){
-			System.out.println(v);
+			//System.out.println(v);
 		}
 
 		if(scopeStack.isEmpty()){
@@ -253,7 +250,6 @@ public class SemanticImpl{
 	}
 	
 	public void validateFunction(String functionName, ArrayList<Parameter> params, Type declaredType) throws InvalidFunctionException, InvalidParameterException{
-		System.out.println("VAlidate Function" + params + declaredType);
 		if(declaredType == null){
 			throw new InvalidFunctionException("The function "+functionName +" is missing either a declared return type or a return statement in the end of it");
 		}
@@ -294,7 +290,7 @@ public class SemanticImpl{
 	
 	//FIXME: INCOMPLETE
 	public Expression getExpression(Expression le, String md, Expression re) throws InvalidTypeException{
-		System.out.println("No getexpression                  " + le.getType().getName() + "   " + re.getType().getName());
+		//System.out.println("No getexpression                  " + le.getType().getName() + "   " + re.getType().getName());
 		if (checkTypeCompatibility(le.getType(), re.getType()) 
 				|| checkTypeCompatibility(re.getType(), le.getType())){
 			Type newType =  getMajorType(le.getType(), re.getType());
@@ -311,13 +307,13 @@ public class SemanticImpl{
 		if (!checkVariableExistence(id)){
 			throw new InvalidVariableException("Variable doesn't exist"); 
 		}
-		System.out.println(expression.getType());
+		//System.out.println(expression.getType());
 		if (!checkValidExistingType(expression.getType())){
 			throw new InvalidTypeException("Type non existing");
 		}
-		System.out.println("AD");
+		//System.out.println("AD");
 		Type identifierType = findVariableByIdentifier(id).getType();
-		System.out.println(identifierType.getName());
+		//System.out.println(identifierType.getName());
 		if (!checkTypeCompatibility(identifierType, expression.getType())){
 			String exceptionMessage = String.format("Incompatible types! %s doesn't match %s", identifierType, expression.getType());
 			throw new InvalidFunctionException(exceptionMessage);
