@@ -1,19 +1,18 @@
 package tests;
 
+import compiler.generated.Parser;
+import compiler.generated.Scanner;
+import java_cup.runtime.Symbol;
+
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
-import java_cup.parser;
-import java_cup.runtime.Symbol;
-import compiler.generated.Parser;
-import compiler.generated.Scanner;
-
 public class ParserTest {
 	
 	public static void main(String[] args) throws IOException {
-		String filePath = "examples/Test.java";
+		String filePath = "examples/SemanticTest.java";
 		Scanner scanner = null;
 		try {
 			scanner = new Scanner(new BufferedReader(new FileReader(filePath)));
@@ -26,6 +25,7 @@ public class ParserTest {
 			s = parser.parse();
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
+			return;
 		}
 		
 		System.out.println("Done!");

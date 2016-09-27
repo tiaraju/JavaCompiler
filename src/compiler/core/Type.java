@@ -16,7 +16,12 @@ public class Type{
 	public boolean equals(Object obj) {
 		if (!(obj instanceof Type))
 			return false;
-		return this.getName().equals(((Type) obj).getName());
+		return this.getName().toLowerCase().equals(((Type) obj).getName().toLowerCase());
+	}
+	
+	@Override
+	public String toString(){
+		return getName();
 	}
 
 }

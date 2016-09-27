@@ -19,4 +19,9 @@ public class DeclarationParameter implements Parameter{
 		return this.name;
 	}
 
+	@Override
+	public String getIdentifier() {
+		return getName();
+	}
+
 }

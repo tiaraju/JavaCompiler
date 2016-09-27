@@ -36,10 +36,6 @@ import compiler.core.*;
 
 	return result;
   }
-
-  private void reportError(int line, String msg) {
-        throw new RuntimeException("Lexical error at line #" + line + ": " + msg);
-  }
 %}
 
 /* Identifiers */
@@ -62,7 +58,7 @@ OctLongLiteral    = 0+ 1? {OctDigit} {1,21} [lL]
 OctDigit          = [0-7]
 
 /* Float literals */
-FloatLiteral  = ({Float1}|{Float2}|{Float3}) {Exponent}? [fF]
+FloatLiteral  = ({Float1}|{Float2}|{Float3}) {Exponent}? [fF]?
 DoubleLiteral = ({Float1}|{Float2}|{Float3}) {Exponent}? [dD]
 
 Float1    = [0-9]+ \. [0-9]*
@@ -181,26 +177,25 @@ Comment = "/**" ( [^*] | \*+ [^/*] )* "*"+ "/"
     /* White spaces */
     {WhiteSpace}				    { /* just ignore it*/}
 
-    /* Assignment */
-    "="							    {return symbol(sym.EQ);}
-
     /* Arithmetical operators*/
-    "+" 							{return symbol(sym.PLUS);}
-    "-" 						    {return symbol(sym.MINUS);}
-    "*" 							{return symbol(sym.MULT);}
-    "/"							    {return symbol(sym.DIV);}
     "++"							{return symbol(sym.PLUSPLUS);}
     "+="							{return symbol(sym.PLUSEQ);}
     "-="							{return symbol(sym.MINUSEQ);}
     "*="						    {return symbol(sym.MULTEQ);}
     "/="				            {return symbol(sym.DIVEQ);}
     "--"							{return symbol(sym.MINUSMINUS);}
-    "%"							    {return symbol(sym.MOD);}
     "%="							{return symbol(sym.MODEQ);}
     "<<"							{return symbol(sym.LSHIFT);}
-    ">>"							{return symbol(sym.RSHIFT);}
     ">>>"							{return symbol(sym.URSHIFT);}
+    ">>"              {return symbol(sym.RSHIFT);}
+    "+"               {return symbol(sym.PLUS);}
+    "-"                 {return symbol(sym.MINUS);}
+    "*"               {return symbol(sym.MULT);}
+    "/"                 {return symbol(sym.DIV);}
+    "%"                 {return symbol(sym.MOD);}
 
+
+    
     /* Operators */
     ":"                             {return symbol(sym.COLON);}
     "~"                             {return symbol(sym.COMP); }
@@ -211,22 +206,26 @@ Comment = "/**" ( [^*] | \*+ [^/*] )* "*"+ "/"
     "<="							{return symbol(sym.LTEQ);}
     "<"							    {return symbol(sym.LT);}
     ">"							    {return symbol(sym.GT);}
-    "||"							{return symbol(sym.OROR);}
-    "||="                           {return symbol(sym.OROREQ);}
+    "||="							{return symbol(sym.OROREQ);}
+    "||"                           {return symbol(sym.OROR);}
     "&&"							{return symbol(sym.ANDAND);}
-    "&"							    {return symbol(sym.AND);}
-    "!"							    {return symbol(sym.NOT);}
     "!="							{return symbol(sym.NOTEQ);}
-    "|"							    {return symbol(sym.OR);}
     "&="							{return symbol(sym.ANDEQ);}
     "|="							{return symbol(sym.OREQ);}
-    "^"						        {return symbol(sym.XOR);}
     "^="                            {return symbol(sym.XOREQ);}
     ">>="							{return symbol(sym.RSHIFTEQ);}
     "<<="							{return symbol(sym.LSHIFTEQ);}
-    "?"                             { return symbol(sym.QUESTION); }
+    "?"               { return symbol(sym.QUESTION); }
+    "!"                 {return symbol(sym.NOT);}
+    "|"                 {return symbol(sym.OR);}
+    "&"                 {return symbol(sym.AND);}
+    "^"                   {return symbol(sym.XOR);}
 
-    <<EOF>>                         { return symbol(sym.EOF); }
+
+
+    /* Assignment */
+    "="                 {return symbol(sym.EQ);}
+
 
 }
 
@@ -274,6 +273,3 @@ Comment = "/**" ( [^*] | \*+ [^/*] )* "*"+ "/"
   {LineTerminator}                  { throw new RuntimeException("Unterminated character literal at end of line"); }
 
 }
-
-/* Input not matched */
-[^] { reportError(yyline+1, "Illegal character \"" + yytext() + "\""); }

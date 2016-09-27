@@ -1,19 +1,21 @@
 package compiler.core;
 
+import compiler.exceptions.InvalidFunctionException;
+
 import java.util.ArrayList;
 import java.util.List;
 
 
-public class Function {
+public class Function extends ScopedEntity{
 	
-	String name;
+
 	Type declaredReturnType;
 	Type returnType;
 	List<Parameter> params;
 	
 	public Function(String name, ArrayList<Parameter>params){
-		this.name = name;
-		if(params != null){
+        super(name);
+        if(params != null){
 			this.params = params;
 		}else{
 			this.params = new ArrayList<Parameter>();
@@ -23,15 +25,10 @@ public class Function {
 	public boolean isReturnValid(){
 		return this.declaredReturnType.equals(this.returnType);
 	}
-	
-	public String getName() {
-		return name;
-	}
-
 	public Type getDeclaredReturnType() {
 		return declaredReturnType;
 	}
-	
+
 	public Type getReturnType(){
 		return returnType;
 	}
@@ -40,6 +37,17 @@ public class Function {
 		return this.params;
 	}
 	
+	public void setDeclaredReturnedType(Type type) {
+		this.declaredReturnType = type;
+	}
+
+	public void validateReturnedType() throws InvalidFunctionException { // Checks if the function returned what it was supposed to..
+		if (!returnType.equals(declaredReturnType))
+			throw new InvalidFunctionException("Function " + getName() + " was supposed to return " + declaredReturnType);
+	}
+	
+	
+	@Override
 	public boolean equals(Object obj){
 		if(!(obj instanceof Function)) return false;
 		Function f= (Function) obj;
@@ -51,8 +59,7 @@ public class Function {
 		}
 		
 		return true;
-		
 	}
-	
+
 
 }

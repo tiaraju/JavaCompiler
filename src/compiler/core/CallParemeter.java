@@ -19,4 +19,9 @@ public class CallParemeter implements Parameter{
 		return this.value;
 	}
 
+	@Override
+	public String getIdentifier() {
+		return null;
+	}
+
 }

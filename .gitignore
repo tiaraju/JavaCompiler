@@ -1,5 +1,5 @@
 .classpath
-.settings
+.settings/
 .project
 src/compiler/generated/Scanner.java~
 bin/
@@ -7,3 +7,4 @@ bin/
 src/compiler/generated/Parser.java
 src/compiler/generated/Scanner.java
 src/compiler/generated/sym.java
+spec/.DS_Store

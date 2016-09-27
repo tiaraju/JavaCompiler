@@ -25,7 +25,7 @@ public class Test extends Main implements Serializable {
     }
 
     public void integers() {
-        int a = 10;
+        int a = "1";
         int b = 20;
     }
 
@@ -71,6 +71,8 @@ public class Test extends Main implements Serializable {
                 + "dhywgdywqgsuqjsiqjs uwhs "
                 + "Mauhsuwswijsiks wuhedywghdwujsoqwks dhywgdywqgsuqjsiqjs uwhs";
         char g = "!:_)(*&&*)oiiis";
+        String a = "testeString";
+        String c = a + "testeConcat";
     }
 
     public void testingWhile(int x, int y){
@@ -78,4 +80,9 @@ public class Test extends Main implements Serializable {
             x = y + 1;
         }
     }
+    
+    public void testBooleanErrors(){
+    	boolean a = 1 + 2;
+    }
+    
 }

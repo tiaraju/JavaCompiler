@@ -750,7 +750,7 @@ assignment_expression ::=
 		conditional_expression
 	|	assignment
 	;
-assignment ::=	left_hand_side assignment_operator assignment_expression
+assignment ::=	left_hand_side:ls assignment_operator:o assignment_expression:e {:Logger.print("Line 753");SemanticImpl.getInstance().checkTypeOfAssignment((Variable) ls,(Expression) e);:}
 	;
 left_hand_side ::=
 		name
