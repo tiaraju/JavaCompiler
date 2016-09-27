@@ -166,7 +166,7 @@ variable_declarator_loop ::= variable_declarator:var {:Logger.print("Line 158");
 variable_declarator ::= IDENTIFIER:id brack_loop attr_opt:exp {:Logger.print("Line 161"); Variable temp = new Variable((String) id, null, (Expression) exp); RESULT = temp;:};
 
 attr_opt ::= {:Logger.print("Line 163");:}
-			| EQ variable_initializer:exp {:Logger.print("164"); RESULT = exp;:}
+			| EQ variable_initializer:exp {:Logger.print("164 " + exp); RESULT = exp;:}
 			;
 
 variable_initializer ::=   expression:e {:Logger.print("Line 167 - Teste de Exp " + e); RESULT = e;:}
@@ -295,15 +295,15 @@ for_statement ::=
 	
 middle_operator ::= 
 	PLUS {: Logger.print("Line 282"); RESULT = "+";:}
-	| PLUSEQ {: Logger.print("Line 283");:}
-	| MINUS {: Logger.print("Line 284");:}
-	| MINUSEQ {: Logger.print("Line 285");:}
-	| MULT {: Logger.print("Line 286");:}
-	| MULTEQ {: Logger.print("Line 287");:}
-	| DIV {: Logger.print("Line 288");:}
-	| DIVEQ {: Logger.print("Line 289");:}
-	| MOD {: Logger.print("Line 290");:}
-	| MODEQ {: Logger.print("Line 291");:};
+	| PLUSEQ {: Logger.print("Line 283");RESULT = "+=";:}
+	| MINUS {: Logger.print("Line 284");RESULT = "-";:}
+	| MINUSEQ {: Logger.print("Line 285");RESULT = "-=";:}
+	| MULT {: Logger.print("Line 286");RESULT = "*";:}
+	| MULTEQ {: Logger.print("Line 287");RESULT = "*=";:}
+	| DIV {: Logger.print("Line 288");RESULT = "/";:}
+	| DIVEQ {: Logger.print("Line 289");RESULT = "/=";:}
+	| MOD {: Logger.print("Line 290");RESULT = "%";:}
+	| MODEQ {: Logger.print("Line 291");RESULT = "%=";:};
 
 for_div_1 ::= 
 	variable_declaration {: Logger.print(" Line 294");:}
@@ -337,17 +337,17 @@ try_statement ::=
 	TRY statement catch_loop finally_opt {: Logger.print("Line 320");:};
 
 logical_option ::=  
-	  AND {: Logger.print("Line 323");:}
-	| ANDEQ {: Logger.print("Line 324");:}
-	| OR {: Logger.print("Line 325");:}
-	| OROR {: Logger.print("Line 326");:}
-	| OREQ {: Logger.print("Line 327");:}
-	| XOR {: Logger.print("Line 328");:}
-	| XOREQ {: Logger.print("Line 329");:}
-	| ANDAND {: Logger.print("Line 330");:}
-	| OROREQ {: Logger.print("Line 331");:}
-	| MOD {: Logger.print("Line 332");:}
-	| MODEQ {: Logger.print("Line 333");:};
+	  AND {: Logger.print("Line 323"); RESULT = "&";:}
+	| ANDEQ {: Logger.print("Line 324");RESULT = "&=";:}
+	| OR {: Logger.print("Line 325");RESULT = "|";:}
+	| OROR {: Logger.print("Line 326");RESULT = "||";:}
+	| OREQ {: Logger.print("Line 327");RESULT = "|=";:}
+	| XOR {: Logger.print("Line 328");RESULT = "^";:}
+	| XOREQ {: Logger.print("Line 329");RESULT = "^=";:}
+	| ANDAND {: Logger.print("Line 330");RESULT = "&&";:}
+	| OROREQ {: Logger.print("Line 331");RESULT = "||=";:}
+	| MOD {: Logger.print("Line 332");RESULT = "%";:}
+	| MODEQ {: Logger.print("Line 333");RESULT = "%=";:};
 
 
 catch_loop ::= 
@@ -412,7 +412,9 @@ literal_expression ::=  INTEGER_LITERAL:i {:RESULT = new Expression(new Type("in
 
 logical_expression ::= 
 	NOT expression {: Logger.print("Line 397");:}
-	| expression logical_option expression {: Logger.print("Line 398");:}
+	| expression:e1 logical_option:lo expression:e2 {: Logger.print("Line 398 "+lo);
+													   AssemblyGenerator.getInstance().generate((String) lo, (Expression) e1, (Expression) e2); 
+   													   RESULT = SemanticImpl.getInstance().getExpression((Expression) e1, (String) lo, (Expression) e2);:}
 	| expression QUESTION expression COLON expression {: Logger.print("Line 399");:}
 	| BOOLEAN_LITERAL:bl {:Logger.print("400 Ta Chegando em boolean_Literal "+bl); RESULT = new Expression(new Type("boolean"),bl.toString());:}
 	;

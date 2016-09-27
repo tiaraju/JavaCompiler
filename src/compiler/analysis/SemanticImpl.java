@@ -73,11 +73,15 @@ public class SemanticImpl{
 		
 		List<String> intCompTypes = new ArrayList<String>();
 		intCompTypes.add("int");
+		
+		List<String> booleanCompTypes = new ArrayList<String>();
+		booleanCompTypes.add("boolean");
 
 		tiposCompativeis.put("double", doubleCompTypes);
 		tiposCompativeis.put("float", floatCompTypes);
 		tiposCompativeis.put("long", longCompTypes);
 		tiposCompativeis.put("int", intCompTypes);
+		tiposCompativeis.put("boolean", booleanCompTypes);
 	}
 	
 	private static void iniTestingOperators(){
@@ -103,7 +107,7 @@ public class SemanticImpl{
 			if(exp != null) {
 				checkDeclaredAndReturnedType(scoped.getName(), ((Function) scoped).getDeclaredReturnType(), exp);
 			}else{
-				System.out.println("O declared eh: "+((Function) scoped).getDeclaredReturnType());
+				//System.out.println("O declared eh: "+((Function) scoped).getDeclaredReturnType());
 				if(!((Function) scoped).getDeclaredReturnType().equals(new Type("void"))){
 					throw new InvalidFunctionException("The function "+scoped.getName() +" is missing a return statement in the end of it");
 				}
@@ -290,9 +294,8 @@ public class SemanticImpl{
 	
 	//FIXME: INCOMPLETE
 	public Expression getExpression(Expression le, String md, Expression re) throws InvalidTypeException{
-		//System.out.println("No getexpression                  " + le.getType().getName() + "   " + re.getType().getName());
-		if (checkTypeCompatibility(le.getType(), re.getType()) 
-				|| checkTypeCompatibility(re.getType(), le.getType())){
+		//System.out.println("No getexpression " + "tipo 1: "+ le.getType().getName() + "   " + "tipo 2: "+ re.getType().getName());
+		if (checkTypeCompatibility(le.getType(), re.getType()) || checkTypeCompatibility(re.getType(), le.getType())){
 			Type newType =  getMajorType(le.getType(), re.getType());
 			return new Expression(newType);
 		}
