@@ -2,6 +2,7 @@ package compiler.analysis;
 
 import compiler.core.*;
 import compiler.exceptions.*;
+import compiler.generator.CodeGenerator;
 
 import java.awt.datatransfer.StringSelection;
 import java.util.*;
@@ -9,6 +10,10 @@ import java.util.*;
 import javax.lang.model.type.DeclaredType;
 
 public class SemanticImpl{
+	
+	public enum Operation {
+		PLUS, MINUS, MULT, DIV, PERC, LE_OP, GE_OP, LESS_THAN, MORE_THAN, EQ_OP, NE_OP, AND_OP, OR_OP, NOT_OP;
+	}
 
 	private HashMap<String,Variable> variables = new HashMap<String,Variable>();
 	private List<Type> secondaryTypes = new ArrayList<Type>();
@@ -22,9 +27,12 @@ public class SemanticImpl{
 	
 	private static SemanticImpl singleton;
 	private Program javaProgram;
+	static CodeGenerator codeGenerator;
+	
 	public static SemanticImpl getInstance(){
 		if(singleton ==  null){
 			singleton = new SemanticImpl();
+			codeGenerator = new CodeGenerator();
 			initCollections();
 		}
 		return singleton;
@@ -83,6 +91,7 @@ public class SemanticImpl{
 		tiposCompativeis.put("int", intCompTypes);
 		tiposCompativeis.put("boolean", booleanCompTypes);
 	}
+	
 	
 	private static void iniTestingOperators(){
 		testingOperators.add("<");
@@ -311,12 +320,13 @@ public class SemanticImpl{
 			throw new InvalidVariableException("Variable doesn't exist"); 
 		}
 		//System.out.println(expression.getType());
-		if (!checkValidExistingType(expression.getType())){
+		if (!expression.getType().equals(new Type("null")) && !checkValidExistingType(expression.getType())){
 			throw new InvalidTypeException("Type non existing");
 		}
 		//System.out.println("AD");
 		Type identifierType = findVariableByIdentifier(id).getType();
 		//System.out.println(identifierType.getName());
+		if(expression.getType().equals(new Type("null"))){return;}
 		if (!checkTypeCompatibility(identifierType, expression.getType())){
 			String exceptionMessage = String.format("Incompatible types! %s doesn't match %s", identifierType, expression.getType());
 			throw new InvalidFunctionException(exceptionMessage);
@@ -363,6 +373,12 @@ public class SemanticImpl{
 		}
 	}
 	
+	public void validateIfElseStatement(Expression exp) throws InvalidIfStatementException{
+		if(exp == null || !exp.getType().equals(new Type("boolean"))){
+			throw new InvalidIfStatementException("The given expression's type: "+exp.getType() +" isn't valid for a IF/ELSE statement.A boolean is required");
+		}
+	}
+	
 	public Expression getTestingExpression(Expression le, String operator,  Expression re) throws InvalidOperationException, InvalidOperatorException{
 		checkTestingExpression(le, operator, re);
 		return new Expression(new Type("boolean"));
@@ -373,4 +389,46 @@ public class SemanticImpl{
 	public void addVariableToTempList(Variable var){
 		tempVariables.add(var);
 	}
+	
+	public CodeGenerator getCodeGenerator(){
+		return codeGenerator;
+	}
+	
+	public void getExpressionForOperation(Operation op, Expression e1, Expression e2) {
+		System.out.println("CHAAAAMMMOOOU");
+		switch (op) {
+		case AND_OP:
+			codeGenerator.generateLDCode(e1);
+			codeGenerator.generateLDCode(e2);
+			codeGenerator.generateMULCode();
+		case OR_OP:
+			codeGenerator.generateLDCode(e1);
+			codeGenerator.generateLDCode(e2);
+			codeGenerator.generateADDCode();
+		case NOT_OP:
+			codeGenerator.generateLDCode(e1);
+			codeGenerator.generateNOTCode();
+		case MINUS:
+			codeGenerator.generateLDCode(e1);
+			codeGenerator.generateLDCode(e2);
+			codeGenerator.generateSUBCode();
+		case MULT:
+			codeGenerator.generateLDCode(e1);
+			codeGenerator.generateLDCode(e2);
+			codeGenerator.generateMULCode();
+		case PLUS:
+			codeGenerator.generateLDCode(e1);
+			codeGenerator.generateLDCode(e2);
+			codeGenerator.generateADDCode();
+		case DIV:
+			codeGenerator.generateLDCode(e1);
+			codeGenerator.generateLDCode(e2);
+			codeGenerator.generateDIVCode();
+		default:
+			break;
+		}
+		
+	}
+
+	
 }

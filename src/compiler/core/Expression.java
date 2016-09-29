@@ -1,6 +1,7 @@
 package compiler.core;
 
 
+
 public class Expression {
 	private Type type;
 	private String value;
@@ -8,6 +9,10 @@ public class Expression {
 	
 	public Expression(Type t) {
 		this.type = t;
+	}
+	
+	public Expression(String name) {
+		type = new Type("UNKNOWN");
 	}
 	
 	public Expression(Type t, String value) {

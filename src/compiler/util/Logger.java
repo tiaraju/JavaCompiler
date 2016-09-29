@@ -2,7 +2,7 @@ package compiler.util;
 
 public class Logger {
 	
-	private static boolean activate_log = false;
+	private static boolean activate_log = true;
 	
 	public static void print(String value) {
 		if (activate_log)
