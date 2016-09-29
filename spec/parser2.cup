@@ -138,7 +138,8 @@ field_declaration ::= method_declaration {:Logger.print("Line 130");:}
 				    | static_initializer {:Logger.print("Line 133");:}
 				    | SEMICOLON {:Logger.print("Line 134");:};
 
-method_declaration ::= modifier_loop type:t IDENTIFIER:id LPAREN parameter_list_opt:p RPAREN{:Logger.print("Line 136 ");SemanticImpl.getInstance().validateFunction(id,(ArrayList<Parameter>) p,(Type)t);:} end_option:ep {:Logger.print("Line 136b "+ ep);SemanticImpl.getInstance().exitCurrentScope((Expression) ep);:};
+method_declaration ::= modifier_loop type:t IDENTIFIER:id LPAREN parameter_list_opt:p RPAREN{:Logger.print("Line 136 ");SemanticImpl.getInstance().validateFunction(id,(ArrayList<Parameter>) p,(Type)t);:} end_option:ep {:Logger.print("Line 136b "+ ep);SemanticImpl.getInstance().exitCurrentScope((Expression) ep);
+																							  SemanticImpl.getInstance().getCodeGenerator().addFunctionAddress(id);:};
 
 constructor_declaration ::= modifier_loop IDENTIFIER LPAREN parameter_list_opt RPAREN statement_block {:Logger.print("Line 138");:};
 
@@ -165,7 +166,7 @@ variable_declarator_loop ::= variable_declarator:var {:Logger.print("Line 158");
 
 variable_declarator ::= IDENTIFIER:id brack_loop attr_opt:exp {:Logger.print("Line 161"); 
 																Variable temp = new Variable((String) id, null, (Expression) exp);
-																SemanticImpl.getInstance().getCodeGenerator().assignmentDeclaration((Variable) temp, exp);
+																SemanticImpl.getInstance().getCodeGenerator().assignmentDeclaration((Variable) temp, (Expression) exp);
 																RESULT = temp;:};
 
 attr_opt ::= {:Logger.print("Line 163");:}
@@ -317,7 +318,7 @@ numeric_expression ::= MINUS expression:e {: Logger.print("Line 298"); SemanticI
 					   | expression:e numeric_option:no {:Logger.print("Line 300, numeric_option:" + "  "); SemanticImpl.getInstance().isNumericExpression((Expression) e); RESULT=e;:}
 					   | expression:le middle_operator:md expression:re {:Logger.print("Linha 302 "+ md); 
 					   													  SemanticImpl.getInstance().isNumericExpression((Expression) le,(Expression) re);
-					   													  AssemblyGenerator.getInstance().generate((String) md, (Expression) le, (Expression) re); 
+					   													  SemanticImpl.getInstance().generateBaseOpCode(Operation.PLUS, (Expression)le, (Expression) re);
 					   													  RESULT = SemanticImpl.getInstance().getExpression((Expression) le, (String) md, (Expression) re);:}
 					   ;
 
@@ -415,7 +416,6 @@ literal_expression ::=  INTEGER_LITERAL:i {:RESULT = new Expression(new Type("in
 logical_expression ::= 
 	NOT expression {: Logger.print("Line 397");:}
 	| expression:e1 logical_option:lo expression:e2 {: Logger.print("Line 398 "+lo);
-													   AssemblyGenerator.getInstance().generate((String) lo, (Expression) e1, (Expression) e2); 
    													   RESULT = SemanticImpl.getInstance().getExpression((Expression) e1, (String) lo, (Expression) e2);:}
 	| expression QUESTION expression COLON expression {: Logger.print("Line 399");:}
 	| BOOLEAN_LITERAL:bl {:Logger.print("400 Ta Chegando em boolean_Literal "+bl); RESULT = new Expression(new Type("boolean"),bl.toString());:}

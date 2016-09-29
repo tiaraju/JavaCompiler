@@ -10,10 +10,6 @@ import java.util.*;
 import javax.lang.model.type.DeclaredType;
 
 public class SemanticImpl{
-	
-	public enum Operation {
-		PLUS, MINUS, MULT, DIV, PERC, LE_OP, GE_OP, LESS_THAN, MORE_THAN, EQ_OP, NE_OP, AND_OP, OR_OP, NOT_OP;
-	}
 
 	private HashMap<String,Variable> variables = new HashMap<String,Variable>();
 	private List<Type> secondaryTypes = new ArrayList<Type>();
@@ -301,16 +297,41 @@ public class SemanticImpl{
 		}
 	}
 	
-	//FIXME: INCOMPLETE
-	public Expression getExpression(Expression le, String md, Expression re) throws InvalidTypeException{
+	public Expression getExpression(Expression le, String md, Expression re) throws InvalidTypeException, InvalidOperationException{
 		//System.out.println("No getexpression " + "tipo 1: "+ le.getType().getName() + "   " + "tipo 2: "+ re.getType().getName());
 		if (checkTypeCompatibility(le.getType(), re.getType()) || checkTypeCompatibility(re.getType(), le.getType())){
 			Type newType =  getMajorType(le.getType(), re.getType());
+			switch(md){
+				case "+":
+					String result = getNumericValue(le,re,md);
+					return new Expression(newType,result);
+				default:
+					break;
+			}
 			return new Expression(newType);
 		}
 		throw new InvalidTypeException("Not allowed!"); 
 	}
 	
+	private String getNumericValue(Expression le, Expression re, String md) throws InvalidOperationException {
+		if(le.getType().equals(new Type("string")) && md.equals("+")){return le.getValue() + re.getValue();}
+		else if(le.getType().equals(new Type("double")) || re.getType().equals(new Type("double"))){
+			return ""+(Double.valueOf(le.getValue()) + Double.valueOf(re.getValue()));
+		}
+		else if(le.getType().equals(new Type("float")) || re.getType().equals(new Type("float"))){
+			return ""+(Float.valueOf(le.getValue()) + Float.valueOf(re.getValue()));
+		}
+		else if(le.getType().equals(new Type("long"))){
+			return ""+(Long.valueOf(le.getValue()) + Long.valueOf(re.getValue()));
+		}
+		else if(le.getType().equals(new Type("int"))){
+			return ""+(Integer.valueOf(le.getValue()) + Integer.valueOf(re.getValue()));
+		}
+		else{throw new InvalidOperationException("Types are not avaible to this kind of operation");}
+		
+		
+	}
+
 	private Type getMajorType(Type type1, Type type2) {
 		return tiposCompativeis.get(type1.getName()).contains(type2.getName()) ? type1: type2;
 	}
@@ -394,36 +415,43 @@ public class SemanticImpl{
 		return codeGenerator;
 	}
 	
-	public void getExpressionForOperation(Operation op, Expression e1, Expression e2) {
+	public void generateBaseOpCode(Operation op, Expression e1, Expression e2) {
 		System.out.println("CHAAAAMMMOOOU");
 		switch (op) {
 		case AND_OP:
 			codeGenerator.generateLDCode(e1);
 			codeGenerator.generateLDCode(e2);
 			codeGenerator.generateMULCode();
+			break;
 		case OR_OP:
 			codeGenerator.generateLDCode(e1);
 			codeGenerator.generateLDCode(e2);
 			codeGenerator.generateADDCode();
+			break;
 		case NOT_OP:
 			codeGenerator.generateLDCode(e1);
 			codeGenerator.generateNOTCode();
+			break;
 		case MINUS:
 			codeGenerator.generateLDCode(e1);
 			codeGenerator.generateLDCode(e2);
 			codeGenerator.generateSUBCode();
+			break;
 		case MULT:
 			codeGenerator.generateLDCode(e1);
 			codeGenerator.generateLDCode(e2);
 			codeGenerator.generateMULCode();
+			break;
 		case PLUS:
 			codeGenerator.generateLDCode(e1);
 			codeGenerator.generateLDCode(e2);
 			codeGenerator.generateADDCode();
+			break;
 		case DIV:
 			codeGenerator.generateLDCode(e1);
 			codeGenerator.generateLDCode(e2);
 			codeGenerator.generateDIVCode();
+			break;
 		default:
 			break;
 		}

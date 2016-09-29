@@ -35,8 +35,8 @@ public class CodeGenerator {
 	}
 
 	public void assignmentDeclaration(Variable var, Object obj) {
-		System.out.println("chegou no assignment");
 		if (obj instanceof Expression) {
+			System.out.println("chegou no assignmenaisjdsjdt");
 			generateLDCode((Expression) obj);
 			generateSTCode(var);
 		}
@@ -135,6 +135,7 @@ public class CodeGenerator {
 	}
 
 	public void generateLDCode(Expression expression) {
+		System.out.println("A expression é; "+expression.getAssemblyValue());
 		if (expression.getAssemblyValue() != null) {
 			register++;
 			labels += 8;

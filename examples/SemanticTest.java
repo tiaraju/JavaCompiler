@@ -1,7 +1,10 @@
 
 public class SemanticTest{
 	
-	int a = 10;
+	
+	public void teste(){
+		float c = 10.0 + 1;
+	}
 	
 }
 
