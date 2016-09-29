@@ -3,6 +3,7 @@ package compiler.analysis;
 import compiler.core.*;
 import compiler.exceptions.*;
 import compiler.generator.CodeGenerator;
+import compiler.util.Calculator;
 
 import java.awt.datatransfer.StringSelection;
 import java.util.*;
@@ -24,11 +25,13 @@ public class SemanticImpl{
 	private static SemanticImpl singleton;
 	private Program javaProgram;
 	static CodeGenerator codeGenerator;
+	private static Calculator calculator;
 	
 	public static SemanticImpl getInstance(){
 		if(singleton ==  null){
 			singleton = new SemanticImpl();
 			codeGenerator = new CodeGenerator();
+			calculator = new Calculator();
 			initCollections();
 		}
 		return singleton;
@@ -301,10 +304,38 @@ public class SemanticImpl{
 		//System.out.println("No getexpression " + "tipo 1: "+ le.getType().getName() + "   " + "tipo 2: "+ re.getType().getName());
 		if (checkTypeCompatibility(le.getType(), re.getType()) || checkTypeCompatibility(re.getType(), le.getType())){
 			Type newType =  getMajorType(le.getType(), re.getType());
+			String result;
 			switch(md){
+			
 				case "+":
-					String result = getNumericValue(le,re,md);
+					result = calculator.getSumNumericValue(le,re,md);
 					return new Expression(newType,result);
+				case "-":
+					result = calculator.getSubNumericValue(le,re,md);
+					return new Expression(newType,result);
+				case "*":
+					result = calculator.getMultNumericValue(le,re,md);
+					return new Expression(newType,result);
+				case "/":
+					result = calculator.getDivNumericValue(le,re,md);
+					return new Expression(newType,result);
+//				case "+=":
+//					result = calculator.getSumEqNumericValue(le,re,md);
+//					return new Expression(newType,result);
+//					break;
+//				case "-=":
+//					result = calculator.getSubEqNumericValue(le,re,md);
+//					return new Expression(newType,result);
+//					break;
+//				case "%":
+//					result = calculator.getModNumericValue(le,re,md);
+//					return new Expression(newType,result);
+//					break;
+//				case "%=":
+//					result = calculator.getModEqNumericValue(le,re,md);
+//					return new Expression(newType,result);
+//					break;
+//				
 				default:
 					break;
 			}
@@ -313,25 +344,6 @@ public class SemanticImpl{
 		throw new InvalidTypeException("Not allowed!"); 
 	}
 	
-	private String getNumericValue(Expression le, Expression re, String md) throws InvalidOperationException {
-		if(le.getType().equals(new Type("string")) && md.equals("+")){return le.getValue() + re.getValue();}
-		else if(le.getType().equals(new Type("double")) || re.getType().equals(new Type("double"))){
-			return ""+(Double.valueOf(le.getValue()) + Double.valueOf(re.getValue()));
-		}
-		else if(le.getType().equals(new Type("float")) || re.getType().equals(new Type("float"))){
-			return ""+(Float.valueOf(le.getValue()) + Float.valueOf(re.getValue()));
-		}
-		else if(le.getType().equals(new Type("long"))){
-			return ""+(Long.valueOf(le.getValue()) + Long.valueOf(re.getValue()));
-		}
-		else if(le.getType().equals(new Type("int"))){
-			return ""+(Integer.valueOf(le.getValue()) + Integer.valueOf(re.getValue()));
-		}
-		else{throw new InvalidOperationException("Types are not avaible to this kind of operation");}
-		
-		
-	}
-
 	private Type getMajorType(Type type1, Type type2) {
 		return tiposCompativeis.get(type1.getName()).contains(type2.getName()) ? type1: type2;
 	}
@@ -415,9 +427,10 @@ public class SemanticImpl{
 		return codeGenerator;
 	}
 	
-	public void generateBaseOpCode(Operation op, Expression e1, Expression e2) {
-		System.out.println("CHAAAAMMMOOOU");
-		switch (op) {
+	public void generateBaseOpCode(String op, Expression e1, Expression e2) {
+		System.out.println("CHAAAAMMMOOOU "+op);
+		Operation operator = getOperator(op);
+		switch (operator) {
 		case AND_OP:
 			codeGenerator.generateLDCode(e1);
 			codeGenerator.generateLDCode(e2);
@@ -456,6 +469,33 @@ public class SemanticImpl{
 			break;
 		}
 		
+	}
+
+	private Operation getOperator(String op) {
+		switch(op){
+		case "+":
+			return Operation.PLUS;
+		case "-":
+			return Operation.MINUS;
+		case "*":
+			return Operation.MULT;
+		case "/":
+			return Operation.DIV;
+		case "<":
+			return Operation.LESS_THAN;
+		case ">":
+			return Operation.MORE_THAN;
+		case "<=":
+			return Operation.LE_OP;
+		case ">=":
+			return Operation.GE_OP;
+		case "==":
+			return Operation.EQ_OP;
+		case "!=":
+			return Operation.NE_OP;
+		default:
+			return Operation.PLUS;
+		}
 	}
 
 	

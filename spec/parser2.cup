@@ -318,7 +318,7 @@ numeric_expression ::= MINUS expression:e {: Logger.print("Line 298"); SemanticI
 					   | expression:e numeric_option:no {:Logger.print("Line 300, numeric_option:" + "  "); SemanticImpl.getInstance().isNumericExpression((Expression) e); RESULT=e;:}
 					   | expression:le middle_operator:md expression:re {:Logger.print("Linha 302 "+ md); 
 					   													  SemanticImpl.getInstance().isNumericExpression((Expression) le,(Expression) re);
-					   													  SemanticImpl.getInstance().generateBaseOpCode(Operation.PLUS, (Expression)le, (Expression) re);
+					   													  SemanticImpl.getInstance().generateBaseOpCode((String) md, (Expression)le, (Expression) re);
 					   													  RESULT = SemanticImpl.getInstance().getExpression((Expression) le, (String) md, (Expression) re);:}
 					   ;
 
@@ -334,7 +334,9 @@ testing_option ::=
 
 testing_expression ::= 
 	expression:le testing_option:to expression:re {: Logger.print("Line 317");
-												  RESULT = SemanticImpl.getInstance().getTestingExpression((Expression) le, (String) to,  (Expression) re);:};
+												  RESULT = SemanticImpl.getInstance().getTestingExpression((Expression) le, (String) to,  (Expression) re);
+												  SemanticImpl.getInstance().generateBaseOpCode((String) to, (Expression)le, (Expression) re);
+												  :};
 
 try_statement ::= 
 	TRY statement catch_loop finally_opt {: Logger.print("Line 320");:};
