@@ -37,7 +37,7 @@ public class CodeGenerator {
 	public void assignmentDeclaration(Variable var, Object obj) {
 		if (obj instanceof Expression) {
 			System.out.println("chegou no assignmenaisjdsjdt");
-			generateLDCode((Expression) obj);
+			//generateLDCode((Expression) obj);
 			generateSTCode(var);
 		}
 		if (obj instanceof Function) {
@@ -84,6 +84,11 @@ public class CodeGenerator {
 		labels += 8;
 		addCode(labels + ": SUB " + result + ", " + one + ", #" + exp.getAssemblyValue());
 	}
+	
+	public void generateSUBCode(Register result, Register one, Register two) {
+		labels += 8;
+		addCode(labels + ": SUB " + result + ", " + one + ", " + two);
+	}
 
 	public void generateMULCode() {
 		labels += 8;
@@ -127,6 +132,46 @@ public class CodeGenerator {
 		Register current = allocateRegister();
 		addCode(labels + ": BEQZ " + current + ", " + jump);
 	}
+	
+	public void generateBNEQZCode(int br) {
+		labels += 8;
+		int jump = (br * 8) + labels;
+
+		Register current = allocateRegister();
+		addCode(labels + ": BNEQZ " + current + ", " + jump);
+	}
+	
+	public void generateBGEQZCode(int br) {
+		labels += 8;
+		int jump = (br * 8) + labels;
+
+		Register current = allocateRegister();
+		addCode(labels + ": BGEQZ " + current + ", " + jump);
+	}
+	
+	public void generateBLEQZCode(int br) {
+		labels += 8;
+		int jump = (br * 8) + labels;
+
+		Register current = allocateRegister();
+		addCode(labels + ": BLEQZ " + current + ", " + jump);
+	}
+	
+	public void generateBLTZCode(int br) {
+		labels += 8;
+		int jump = (br * 8) + labels;
+
+		Register current = allocateRegister();
+		addCode(labels + ": BLTZ " + current + ", " + jump);
+	}
+	
+	public void generateBGTZCode(int br) {
+		labels += 8;
+		int jump = (br * 8) + labels;
+
+		Register current = allocateRegister();
+		addCode(labels + ": BGTZ " + current + ", " + jump);
+	}
 
 	public void generateBRCode(int br) {
 		labels += 8;
@@ -134,13 +179,15 @@ public class CodeGenerator {
 		addCode(labels + ": BR " + jump);
 	}
 
-	public void generateLDCode(Expression expression) {
-		System.out.println("A expression é; "+expression.getAssemblyValue());
+	public Register generateLDCode(Expression expression) {
+		Register r = null;
 		if (expression.getAssemblyValue() != null) {
 			register++;
 			labels += 8;
-			addCode(labels + ": LD " + allocateRegister() + ", " + expression.getAssemblyValue());
+			r = allocateRegister();
+			addCode(labels + ": LD " + r + ", " + expression.getAssemblyValue());
 		}
+		return r;
 	}
 
 	public void generateSTCode(Variable variable) {
@@ -163,10 +210,9 @@ public class CodeGenerator {
 
 	public void addCode(String assemblyString) {
 		assemblyCode += assemblyString + "\n";
-		/**
-		System.out.println("\n ############################################### \n");
+		System.out.println("############################################### \n");
 		System.out.println(getAssemblyCode());
-		System.out.println("\n ############################################### \n");*/
+		System.out.println("############################################### \n");
 	}
 
 //	public void addSwitch(Switch s) {
@@ -272,6 +318,9 @@ public class CodeGenerator {
 			return allocateRegister();
 		}
 	}
-
+	
+	public int getLabels(){
+		return labels;
+	}
 	
 }

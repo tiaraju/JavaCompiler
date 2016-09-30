@@ -270,7 +270,7 @@ expression ::= numeric_expression:ne {:Logger.print("Line 257, ne = "); RESULT =
               | bit_expression:be {: Logger.print("Line 260 ");RESULT = be;:}
               | casting_expression:ce {: Logger.print("Line 261 ");RESULT = ce;:}
               | creating_expression:cre {: Logger.print("Line 262 ");RESULT = cre;:}
-              | literal_expression:le {:Logger.print("Line 263, le = " + ((Expression)le).getValue()); RESULT = le;:}
+              | literal_expression:le {:Logger.print("Line 263, le = " + ((Expression)le).getValue()); RESULT = le; SemanticImpl.getInstance().getCodeGenerator().generateLDCode((Expression) le);:}
               | logical_expression:lge {: Logger.print("Line 264 "); RESULT = lge;:}
               | SUPER:sup {: Logger.print("Line 266 ");RESULT = sup;:}
               | THIS:th {: Logger.print("Line 267 ");RESULT = th;:}
@@ -285,6 +285,7 @@ attribution ::= IDENTIFIER:id EQ expression:e {: Logger.print("Line 273 " + e);
 												 SemanticImpl.getInstance().checkVariableAttribution(id, (Expression) e);
 												 Variable var = SemanticImpl.getInstance().findVariableByIdentifier((String) id);
 												 var.setValue((Expression) e);
+												 SemanticImpl.getInstance().getCodeGenerator().assignmentDeclaration((Variable)var,(Expression)e);
 												 RESULT = e;:};
 
 numeric_option ::= PLUSPLUS:op {: Logger.print("Line 275"); RESULT = op;:}
@@ -335,7 +336,7 @@ testing_option ::=
 testing_expression ::= 
 	expression:le testing_option:to expression:re {: Logger.print("Line 317");
 												  RESULT = SemanticImpl.getInstance().getTestingExpression((Expression) le, (String) to,  (Expression) re);
-												  SemanticImpl.getInstance().generateBaseOpCode((String) to, (Expression)le, (Expression) re);
+												  SemanticImpl.getInstance().generateBaseOpRelCode((String) to, (Expression)le, (Expression) re);
 												  :};
 
 try_statement ::= 

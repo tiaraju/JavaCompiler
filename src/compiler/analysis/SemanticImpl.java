@@ -4,11 +4,12 @@ import compiler.core.*;
 import compiler.exceptions.*;
 import compiler.generator.CodeGenerator;
 import compiler.util.Calculator;
+import compiler.util.Register;
 
 import java.awt.datatransfer.StringSelection;
 import java.util.*;
 
-import javax.lang.model.type.DeclaredType;
+
 
 public class SemanticImpl{
 
@@ -21,6 +22,7 @@ public class SemanticImpl{
 	private static Map<String, List<String>> tiposCompativeis = new HashMap<String, List<String>>();
 	private static List<String> testingOperators = new ArrayList<String>();
 	private static List<Type> BASIC_TYPES;
+	private static int blockSize = 0;
 	
 	private static SemanticImpl singleton;
 	private Program javaProgram;
@@ -42,7 +44,18 @@ public class SemanticImpl{
 		initTypeCompatibility();
 		iniTestingOperators();
 	}
-
+	
+	public int getBlockSize(){
+		return this.blockSize;
+	}
+	
+	public void incBlockSize(){
+		this.blockSize++;
+	}
+	
+	public void resetBlockSize(){
+		this.blockSize = 0;
+	}
 	protected SemanticImpl(){
         javaProgram = new Program();
 	}
@@ -427,42 +440,58 @@ public class SemanticImpl{
 		return codeGenerator;
 	}
 	
+	public void generateBaseOpRelCode(String op, Expression e1, Expression e2) {
+		switch (op) {
+			case "!=":
+				codeGenerator.generateSUBCode();
+				codeGenerator.generateBEQZCode(2);
+				break;
+			case "==":
+				codeGenerator.generateSUBCode();
+				codeGenerator.generateBNEQZCode(2);
+				break;
+			case ">=":
+				codeGenerator.generateSUBCode();
+				codeGenerator.generateBLTZCode(2);	
+				break;
+			case "<=":
+				codeGenerator.generateSUBCode();
+				codeGenerator.generateBGTZCode(2);
+				break;
+			case ">":
+				codeGenerator.generateSUBCode();
+				codeGenerator.generateBLEQZCode(2);
+				break;
+			case "<":
+				codeGenerator.generateSUBCode();
+				codeGenerator.generateBGEQZCode(2);
+				break;
+		}
+	}
+	
 	public void generateBaseOpCode(String op, Expression e1, Expression e2) {
 		System.out.println("CHAAAAMMMOOOU "+op);
 		Operation operator = getOperator(op);
 		switch (operator) {
 		case AND_OP:
-			codeGenerator.generateLDCode(e1);
-			codeGenerator.generateLDCode(e2);
 			codeGenerator.generateMULCode();
 			break;
 		case OR_OP:
-			codeGenerator.generateLDCode(e1);
-			codeGenerator.generateLDCode(e2);
 			codeGenerator.generateADDCode();
 			break;
 		case NOT_OP:
-			codeGenerator.generateLDCode(e1);
 			codeGenerator.generateNOTCode();
 			break;
 		case MINUS:
-			codeGenerator.generateLDCode(e1);
-			codeGenerator.generateLDCode(e2);
 			codeGenerator.generateSUBCode();
 			break;
 		case MULT:
-			codeGenerator.generateLDCode(e1);
-			codeGenerator.generateLDCode(e2);
 			codeGenerator.generateMULCode();
 			break;
 		case PLUS:
-			codeGenerator.generateLDCode(e1);
-			codeGenerator.generateLDCode(e2);
 			codeGenerator.generateADDCode();
 			break;
 		case DIV:
-			codeGenerator.generateLDCode(e1);
-			codeGenerator.generateLDCode(e2);
 			codeGenerator.generateDIVCode();
 			break;
 		default:

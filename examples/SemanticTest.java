@@ -1,10 +1,10 @@
 
 public class SemanticTest{
-	
-	
 	public void teste(){
-		boolean a = 10 < 9;
-	}
-	
+		int a = 22;
+		if(2 < 4) {
+			a = 5;
+		}
+	}	
 }
 
