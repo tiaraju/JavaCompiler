@@ -1,9 +1,17 @@
 
 public class SemanticTest{
-	public void teste(){
-		if(3 != 7){
-			int b = 2;
+	
+	public int teste(int b){
+		return 10;
+	}
+	
+	public int test(int a){
+		if (10 < 20){
+			teste(20);
+		}else{
+			teste(30);
 		}
-	}	
+		return 10;
+	}
 }
 

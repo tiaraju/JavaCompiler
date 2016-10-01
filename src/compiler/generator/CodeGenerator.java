@@ -1,5 +1,9 @@
 package compiler.generator;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -71,7 +75,6 @@ public class CodeGenerator {
 
 	public void generateSUBCode() {
 		labels += 8;
-
 		Register one = registers[register - 1];
 		Register two = allocateRegister();
 
@@ -182,6 +185,7 @@ public class CodeGenerator {
 	public Register generateLDCode(Expression expression) {
 		Register r = null;
 		if (expression.getAssemblyValue() != null) {
+//			System.out.println("Register before ld: "+register);
 			register++;
 			labels += 8;
 			r = allocateRegister();
@@ -218,9 +222,9 @@ public class CodeGenerator {
 
 	public void addCode(String assemblyString) {
 		assemblyCode += assemblyString + "\n";
-		System.out.println("############################################### \n");
-		System.out.println(getAssemblyCode());
-		System.out.println("############################################### \n");
+//		System.out.println("############################################### \n");
+//		System.out.println(getAssemblyCode());
+//		System.out.println("############################################### \n");
 	}
 
 //	public void addSwitch(Switch s) {
@@ -319,7 +323,7 @@ public class CodeGenerator {
 	
 	public Register allocateRegister(){
 		try {
-			Register allocated = registers[register]; 
+			Register allocated = registers[register];
 			return allocated;
 		} catch (Exception e) {
 			register++; 
@@ -329,6 +333,12 @@ public class CodeGenerator {
 	
 	public int getLabels(){
 		return labels;
+	}
+
+	public void generateFinalAssemblyCode() throws IOException {
+		BufferedWriter writer = new BufferedWriter(new FileWriter(new File("assembly.txt")));
+		writer.write(assemblyCode);
+		writer.close();
 	}
 	
 }

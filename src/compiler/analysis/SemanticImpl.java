@@ -1,18 +1,35 @@
 package compiler.analysis;
 
-import compiler.core.*;
-import compiler.exceptions.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Stack;
+
+import compiler.core.Expression;
+import compiler.core.Function;
+import compiler.core.Operation;
+import compiler.core.Parameter;
+import compiler.core.Program;
+import compiler.core.ScopedEntity;
+import compiler.core.Type;
+import compiler.core.Variable;
+import compiler.exception.InvalidFunctionCallException;
+import compiler.exceptions.InvalidFunctionException;
+import compiler.exceptions.InvalidIfStatementException;
+import compiler.exceptions.InvalidOperationException;
+import compiler.exceptions.InvalidOperatorException;
+import compiler.exceptions.InvalidParameterException;
+import compiler.exceptions.InvalidTypeAssignmentException;
+import compiler.exceptions.InvalidTypeException;
+import compiler.exceptions.InvalidVariableException;
 import compiler.generator.CodeGenerator;
 import compiler.util.Calculator;
 import compiler.util.Register;
 
-import java.util.*;
+public class SemanticImpl {
 
-
-
-public class SemanticImpl{
-
-	private HashMap<String,Variable> variables = new HashMap<String,Variable>();
+	private HashMap<String, Variable> variables = new HashMap<String, Variable>();
 	private List<Type> secondaryTypes = new ArrayList<Type>();
 	private ArrayList<Function> functions = new ArrayList<Function>();
 	private List<Variable> tempVariables = new ArrayList<Variable>();
@@ -22,15 +39,15 @@ public class SemanticImpl{
 	private static List<String> testingOperators = new ArrayList<String>();
 	private static List<Type> BASIC_TYPES;
 	private static int blockSize = 0;
-	
+
 	private static SemanticImpl singleton;
 	private Program javaProgram;
 	static CodeGenerator codeGenerator;
 	private static Calculator calculator;
 	private static String currentOperator;
-	
-	public static SemanticImpl getInstance(){
-		if(singleton ==  null){
+
+	public static SemanticImpl getInstance() {
+		if (singleton == null) {
 			singleton = new SemanticImpl();
 			codeGenerator = new CodeGenerator();
 			calculator = new Calculator();
@@ -38,62 +55,65 @@ public class SemanticImpl{
 		}
 		return singleton;
 	}
-	
+
 	private static void initCollections() {
-		initBasicTypes();		
+		initBasicTypes();
 		initTypeCompatibility();
 		iniTestingOperators();
 	}
-	
-	public int getBlockSize(){
+
+	public int getBlockSize() {
 		return this.blockSize;
 	}
-	
-	public void incBlockSize(){
+
+	public void incBlockSize() {
 		this.blockSize++;
 	}
-	
-	public void resetBlockSize(){
+
+	public void resetBlockSize() {
 		this.blockSize = 0;
 	}
-	protected SemanticImpl(){
-        javaProgram = new Program();
+
+	protected SemanticImpl() {
+		javaProgram = new Program();
 	}
-	
-	private static void initBasicTypes(){
-		BASIC_TYPES = new ArrayList<Type>(){{
-			add(new Type("int") );
-			add(new Type("float")); 
-			add(new Type("double")); 
-			add(new Type("long"));
-			add(new Type("char")); 
-			add(new Type("void"));
-			add(new Type("String"));
-			add(new Type("boolean")); 
-			add(new Type("Object"));
-			add(new Type("Integer")); 
-		}};
+
+	private static void initBasicTypes() {
+		BASIC_TYPES = new ArrayList<Type>() {
+			{
+				add(new Type("int"));
+				add(new Type("float"));
+				add(new Type("double"));
+				add(new Type("long"));
+				add(new Type("char"));
+				add(new Type("void"));
+				add(new Type("String"));
+				add(new Type("boolean"));
+				add(new Type("Object"));
+				add(new Type("Integer"));
+			}
+		};
 	}
-	
-	private static void initTypeCompatibility(){
+
+	private static void initTypeCompatibility() {
 		List<String> doubleCompTypes = new ArrayList<String>();
 		doubleCompTypes.add("int");
 		doubleCompTypes.add("float");
 		doubleCompTypes.add("double");
 		doubleCompTypes.add("long");
-		
+
 		List<String> floatCompTypes = new ArrayList<String>();
 		floatCompTypes.add("int");
 		floatCompTypes.add("float");
 		floatCompTypes.add("long");
-		
+
 		List<String> longCompTypes = new ArrayList<String>();
 		longCompTypes.add("long");
 		longCompTypes.add("int");
-		
+
 		List<String> intCompTypes = new ArrayList<String>();
 		intCompTypes.add("int");
-		
+
 		List<String> booleanCompTypes = new ArrayList<String>();
 		booleanCompTypes.add("boolean");
 
@@ -103,9 +123,8 @@ public class SemanticImpl{
 		tiposCompativeis.put("int", intCompTypes);
 		tiposCompativeis.put("boolean", booleanCompTypes);
 	}
-	
-	
-	private static void iniTestingOperators(){
+
+	private static void iniTestingOperators() {
 		testingOperators.add("<");
 		testingOperators.add(">");
 		testingOperators.add("<=");
@@ -114,27 +133,60 @@ public class SemanticImpl{
 		testingOperators.add("!=");
 	}
 
-
 	private void createNewScope(ScopedEntity scope) {
 		scopeStack.push(scope);
 	}
 
 	public void exitCurrentScope() throws InvalidFunctionException {
+		System.out.println("EH O OUTRO EXIT");
 		ScopedEntity scoped = scopeStack.pop();
+		checkDeclaredAndReturnedType(scoped.getName(),
+				((Function) scoped).getDeclaredReturnType(), null);
 	}
-	public void exitCurrentScope(Expression exp) throws InvalidFunctionException {
+
+	public void checkVariableAttribution(String id, String function)
+			throws InvalidVariableException, InvalidTypeException,
+			InvalidFunctionException {
+		if (!checkVariableExistence(id)) {
+			throw new InvalidVariableException("Variable doesn't exist");
+		}
+		Type identifierType = findVariableByIdentifier(id).getType();
+
+		for (Function f : functions) {
+			if (f.getName().equals(function)) {
+				if (!checkTypeCompatibility(identifierType,
+						f.getDeclaredReturnType())) {
+					String exceptionMessage = String.format(
+							"Incompatible types! %s doesn't match %s",
+							identifierType, f.getDeclaredReturnType());
+					throw new InvalidFunctionException(exceptionMessage);
+				}
+			}
+		}
+
+	}
+
+	public void exitCurrentScope(Expression exp)
+			throws InvalidFunctionException {
+		System.out.println("FOI NO EXIT SCOPE");
 		ScopedEntity scoped = scopeStack.pop();
-		if(scoped instanceof  Function){
-			if(exp != null) {
-				checkDeclaredAndReturnedType(scoped.getName(), ((Function) scoped).getDeclaredReturnType(), exp);
-			}else{
-				//System.out.println("O declared eh: "+((Function) scoped).getDeclaredReturnType());
-				if(!((Function) scoped).getDeclaredReturnType().equals(new Type("void"))){
-					throw new InvalidFunctionException("The function "+scoped.getName() +" is missing a return statement in the end of it");
+		if (scoped instanceof Function) {
+			if (exp != null) {
+				checkDeclaredAndReturnedType(scoped.getName(),
+						((Function) scoped).getDeclaredReturnType(), exp);
+			} else {
+				// System.out.println("O declared eh: "+((Function)
+				// scoped).getDeclaredReturnType());
+				if (!((Function) scoped).getDeclaredReturnType().equals(
+						new Type("void"))) {
+					throw new InvalidFunctionException("The function "
+							+ scoped.getName()
+							+ " is missing a return statement in the end of it");
 				}
 			}
 		}
 	}
+
 	public ScopedEntity getCurrentScope() {
 		return scopeStack.peek();
 	}
@@ -145,16 +197,19 @@ public class SemanticImpl{
 	}
 
 	public boolean checkVariableExistence(String variableName) {
-		if(!scopeStack.isEmpty() && getCurrentScope().getVariable().get(variableName) != null){
+		if (!scopeStack.isEmpty()
+				&& getCurrentScope().getVariable().get(variableName) != null) {
 			return true;
-		}else{
+		} else {
 			return variables.get(variableName) != null ? true : false;
 		}
 	}
+
 	public boolean checkVariableExistenceLocal(String variableName) {
-		if(!scopeStack.isEmpty() && getCurrentScope().getVariable().get(variableName) != null){
+		if (!scopeStack.isEmpty()
+				&& getCurrentScope().getVariable().get(variableName) != null) {
 			return true;
-		}else{
+		} else {
 			return false;
 		}
 	}
@@ -162,9 +217,12 @@ public class SemanticImpl{
 	public boolean checkVariableExistenceGlobal(String variableName) {
 		return variables.get(variableName) != null ? true : false;
 	}
-   public void checkFunctionExistence(Function temp) throws InvalidFunctionException {
-		if(javaProgram.getFunctions().get(temp.getName()) != null){
-			throw new InvalidFunctionException("ERROR: The function "+temp.getName()+" has already been declared!");
+
+	public void checkFunctionExistence(Function temp) throws InvalidFunctionException {
+		System.out.println("ta chegnado no check");
+		if (functions.contains(temp)) {
+			throw new InvalidFunctionException("ERROR: The function "
+					+ temp.getName() + " has already been declared!");
 		}
 	}
 
@@ -173,384 +231,483 @@ public class SemanticImpl{
 	}
 
 	public boolean checkTypeCompatibility(Type leftType, Type rightType) {
-		if (leftType.equals(rightType)){
+		if (leftType.equals(rightType)) {
 			return true;
 		} else {
 			List<String> tipos = tiposCompativeis.get(leftType.getName());
-			if(tipos == null) return false;
+			if (tipos == null)
+				return false;
 			return tipos.contains(rightType.getName());
 		}
 	}
-	
-	public void addType(Type type){
-		if(!secondaryTypes.contains(type)){
+
+	public void addType(Type type) {
+		if (!secondaryTypes.contains(type)) {
 			secondaryTypes.add(type);
 			List<String> tipos = new ArrayList<String>();
 			tipos.add(type.getName());
 			tiposCompativeis.put(type.getName(), tipos);
 		}
 	}
-	
-	public boolean checkTypeOfAssignment(Variable variable, Expression exp) throws InvalidTypeAssignmentException{
-		if (!variable.getType().equals(exp.getType())){
+
+	public boolean checkTypeOfAssignment(Variable variable, Expression exp)
+			throws InvalidTypeAssignmentException {
+		if (!variable.getType().equals(exp.getType())) {
 			throw new InvalidTypeAssignmentException("Alguma msg aqui");
 		}
 		return true;
 	}
-	
-	public boolean isNumericExpression(Expression le, Expression re) throws InvalidOperationException{
-		if(!le.isNumeric() || !re.isNumeric()){
+
+	public boolean isNumericExpression(Expression le, Expression re)
+			throws InvalidOperationException {
+		if (!le.isNumeric() || !re.isNumeric()) {
 			throw new InvalidOperationException("Not a numeric expression");
 		}
 		return true;
 	}
-	
-	public boolean isNumericExpression(Expression le) throws InvalidOperationException{
-        if(!le.isNumeric()){
-            throw new InvalidOperationException("Not a numeric expression");
+
+	public boolean isNumericExpression(Expression le)
+			throws InvalidOperationException {
+		if (!le.isNumeric()) {
+			throw new InvalidOperationException("Not a numeric expression");
 		}
 		return true;
 	}
-	
+
 	/**
-	 * Valida uma variavel: 
-	 * 	- se o tipo dela existe
-	 *  - se o nome ja esta em uso
-	 *  
-	 * @param variable variable a ser validade 
+	 * Valida uma variavel: - se o tipo dela existe - se o nome ja esta em uso
+	 * 
+	 * @param variable
+	 *            variable a ser validade
 	 * 
 	 * @throws Exception
 	 */
-	private void validateVariable(Variable variable) throws Exception{
-		if (checkVariableExistenceLocal(variable.getIdentifier())){
-			throw new InvalidVariableException("Name already exists"); 
-		}
-		if (!checkValidExistingType(variable.getType())){
-			throw new InvalidTypeException("Type non existing");
-		}
-	}
-	private void validateVariableGlobal(Variable variable) throws Exception{
-		if (checkVariableExistenceGlobal(variable.getIdentifier())){
+	private void validateVariable(Variable variable) throws Exception {
+		if (checkVariableExistenceLocal(variable.getIdentifier())) {
 			throw new InvalidVariableException("Name already exists");
 		}
-		if (!checkValidExistingType(variable.getType())){
+		if (!checkValidExistingType(variable.getType())) {
 			throw new InvalidTypeException("Type non existing");
 		}
 	}
-	
+
+	private void validateVariableGlobal(Variable variable) throws Exception {
+		if (checkVariableExistenceGlobal(variable.getIdentifier())) {
+			throw new InvalidVariableException("Name already exists");
+		}
+		if (!checkValidExistingType(variable.getType())) {
+			throw new InvalidTypeException("Type non existing");
+		}
+	}
+
 	/**
-	 * Valida uma variavel.
-	 * Caso seja valida, adiciona a um mapa de variaveis sendo usadas.
-	 *  
-	 * @param variable variable a ser validade e posteriormente adicionada.
+	 * Valida uma variavel. Caso seja valida, adiciona a um mapa de variaveis
+	 * sendo usadas.
+	 * 
+	 * @param variable
+	 *            variable a ser validade e posteriormente adicionada.
 	 * 
 	 * @throws Exception
 	 */
-	private void addVariable(Variable variable) throws Exception{
-		for(String v : variables.keySet()){
-			//System.out.println(v);
+	private void addVariable(Variable variable) throws Exception {
+		for (String v : variables.keySet()) {
+			// System.out.println(v);
 		}
 
-		if(scopeStack.isEmpty()){
+		if (scopeStack.isEmpty()) {
 			validateVariableGlobal(variable);
 
-			variables.put(variable.getIdentifier(),variable);
-		}else{
+			variables.put(variable.getIdentifier(), variable);
+		} else {
 			validateVariable(variable);
 			getCurrentScope().addVariable(variable);
 		}
 
-		if (variable.getValue() != null){
-			checkVariableAttribution(variable.getIdentifier(), variable.getValue());
+		if (variable.getValue() != null) {
+			checkVariableAttribution(variable.getIdentifier(),
+					variable.getValue());
 		}
 	}
-	
-	public void addVariablesFromTempList(Type type) throws Exception{
+
+	public void addVariablesFromTempList(Type type) throws Exception {
 		for (Variable variable : tempVariables) {
 			variable.setType(type);
 			addVariable(variable);
 		}
-		
+
 		tempVariables = new ArrayList<Variable>();
 	}
-	
-	public void validateFunction(String functionName, ArrayList<Parameter> params, Type declaredType) throws InvalidFunctionException, InvalidParameterException{
-		if(declaredType == null){
-			throw new InvalidFunctionException("The function "+functionName +" is missing either a declared return type or a return statement in the end of it");
+
+	public void validateFunction(String functionName, ArrayList<Parameter> params, Type declaredType) throws InvalidFunctionException, InvalidParameterException {
+		if (declaredType == null) {
+			throw new InvalidFunctionException(
+					"The function "
+							+ functionName
+							+ " is missing either a declared return type or a return statement in the end of it");
 		}
 		Function temp = new Function(functionName, params);
-		if(params != null){
-			for(Parameter p : params){
+		checkFunctionExistence(temp);
+
+		if (params != null) {
+			for (Parameter p : params) {
 				variables.put(p.getIdentifier(), (Variable) p);
 			}
 			checkExistingParameter(params);
-			checkFunctionExistence(temp);
 		}
 		temp.setDeclaredReturnedType(declaredType);
 		addFunctionAndNewScope(temp);
 	}
 
 	private void hasReturn(Expression exp) throws InvalidFunctionException {
-		if(!exp.getContext().equalsIgnoreCase("return")){
+		if (!exp.getContext().equalsIgnoreCase("return")) {
 			throw new InvalidFunctionException("Missing a return statement");
 		}
 	}
 
-	private void checkDeclaredAndReturnedType(String functionName,Type declaredType, Expression exp) throws InvalidFunctionException {
-		if(!declaredType.equals(exp.getType())){
-			throw new InvalidFunctionException("The function "+functionName+" didn't return the expected type: "+declaredType+". It returns "+exp.getType() + " instead");
+	private void checkDeclaredAndReturnedType(String functionName,
+			Type declaredType, Expression exp) throws InvalidFunctionException {
+		System.out.println("checking declared and returned");
+		if(exp == null && !declaredType.equals(new Type("void"))){
+			throw new InvalidFunctionException("The function has no return statement");
+		}
+		if(!declaredType.equals(new Type("void"))){
+			hasReturn(exp);
+		}
+		
+		if (!declaredType.equals(exp.getType())) {
+			throw new InvalidFunctionException("The function " + functionName
+					+ " didn't return the expected type: " + declaredType
+					+ ". It returns " + exp.getType() + " instead");
 		}
 	}
-	
 
-	private void checkExistingParameter(ArrayList<Parameter> params) throws InvalidParameterException {
-		for(int i=0; i<params.size();i++){
-			for(int k=i+1;k<params.size();k++){
-				if(params.get(i).getIdentifier().equals(params.get(k).getIdentifier())){
-					throw new InvalidParameterException("The parameter: "+params.get(k).getIdentifier()+ " has been previously defined.");
+	private void checkExistingParameter(ArrayList<Parameter> params)
+			throws InvalidParameterException {
+		for (int i = 0; i < params.size(); i++) {
+			for (int k = i + 1; k < params.size(); k++) {
+				if (params.get(i).getIdentifier()
+						.equals(params.get(k).getIdentifier())) {
+					throw new InvalidParameterException("The parameter: "
+							+ params.get(k).getIdentifier()
+							+ " has been previously defined.");
 				}
 			}
 		}
 	}
-	
-	public Expression getExpression(Expression le, String md, Expression re) throws InvalidTypeException, InvalidOperationException{
-		//System.out.println("No getexpression " + "tipo 1: "+ le.getType().getName() + "   " + "tipo 2: "+ re.getType().getName());
-		if (checkTypeCompatibility(le.getType(), re.getType()) || checkTypeCompatibility(re.getType(), le.getType())){
-			Type newType =  getMajorType(le.getType(), re.getType());
+
+	public Expression getExpression(Expression le, String md, Expression re)
+			throws InvalidTypeException, InvalidOperationException {
+		// System.out.println("No getexpression " + "tipo 1: "+
+		// le.getType().getName() + "   " + "tipo 2: "+ re.getType().getName());
+		if (checkTypeCompatibility(le.getType(), re.getType())
+				|| checkTypeCompatibility(re.getType(), le.getType())) {
+			Type newType = getMajorType(le.getType(), re.getType());
 			String result;
-			switch(md){
-			
-				case "+":
-					result = calculator.getSumNumericValue(le,re,md);
-					return new Expression(newType,result);
-				case "-":
-					result = calculator.getSubNumericValue(le,re,md);
-					return new Expression(newType,result);
-				case "*":
-					result = calculator.getMultNumericValue(le,re,md);
-					return new Expression(newType,result);
-				case "/":
-					result = calculator.getDivNumericValue(le,re,md);
-					return new Expression(newType,result);
-//				case "+=":
-//					result = calculator.getSumEqNumericValue(le,re,md);
-//					return new Expression(newType,result);
-//					break;
-//				case "-=":
-//					result = calculator.getSubEqNumericValue(le,re,md);
-//					return new Expression(newType,result);
-//					break;
-//				case "%":
-//					result = calculator.getModNumericValue(le,re,md);
-//					return new Expression(newType,result);
-//					break;
-//				case "%=":
-//					result = calculator.getModEqNumericValue(le,re,md);
-//					return new Expression(newType,result);
-//					break;
-//				
-				default:
-					break;
+			switch (md) {
+
+			case "+":
+				result = calculator.getSumNumericValue(le, re, md);
+				return new Expression(newType, result);
+			case "-":
+				result = calculator.getSubNumericValue(le, re, md);
+				return new Expression(newType, result);
+			case "*":
+				result = calculator.getMultNumericValue(le, re, md);
+				return new Expression(newType, result);
+			case "/":
+				result = calculator.getDivNumericValue(le, re, md);
+				return new Expression(newType, result);
+				// case "+=":
+				// result = calculator.getSumEqNumericValue(le,re,md);
+				// return new Expression(newType,result);
+				// break;
+				// case "-=":
+				// result = calculator.getSubEqNumericValue(le,re,md);
+				// return new Expression(newType,result);
+				// break;
+				// case "%":
+				// result = calculator.getModNumericValue(le,re,md);
+				// return new Expression(newType,result);
+				// break;
+				// case "%=":
+				// result = calculator.getModEqNumericValue(le,re,md);
+				// return new Expression(newType,result);
+				// break;
+				//
+			default:
+				break;
 			}
 			return new Expression(newType);
 		}
-		throw new InvalidTypeException("Not allowed!"); 
-	}
-	
-	private Type getMajorType(Type type1, Type type2) {
-		return tiposCompativeis.get(type1.getName()).contains(type2.getName()) ? type1: type2;
+		throw new InvalidTypeException("Not allowed!");
 	}
 
-	public void checkVariableAttribution(String id, Expression expression) throws InvalidVariableException, InvalidTypeException, InvalidFunctionException{
-		if (!checkVariableExistence(id)){
-			throw new InvalidVariableException("Variable doesn't exist"); 
+	private Type getMajorType(Type type1, Type type2) {
+		return tiposCompativeis.get(type1.getName()).contains(type2.getName()) ? type1
+				: type2;
+	}
+
+	public void checkVariableAttribution(String id, Expression expression)
+			throws InvalidVariableException, InvalidTypeException,
+			InvalidFunctionException {
+		if (!checkVariableExistence(id)) {
+			throw new InvalidVariableException("Variable doesn't exist");
 		}
-		//System.out.println(expression.getType());
-		if (!expression.getType().equals(new Type("null")) && !checkValidExistingType(expression.getType())){
+		// System.out.println(expression.getType());
+		if (!expression.getType().equals(new Type("null"))
+				&& !checkValidExistingType(expression.getType())) {
 			throw new InvalidTypeException("Type non existing");
 		}
-		//System.out.println("AD");
+		// System.out.println("AD");
 		Type identifierType = findVariableByIdentifier(id).getType();
-		//System.out.println(identifierType.getName());
-		if(expression.getType().equals(new Type("null"))){return;}
-		if (!checkTypeCompatibility(identifierType, expression.getType())){
-			String exceptionMessage = String.format("Incompatible types! %s doesn't match %s", identifierType, expression.getType());
+		// System.out.println(identifierType.getName());
+		if (expression.getType().equals(new Type("null"))) {
+			return;
+		}
+		if (!checkTypeCompatibility(identifierType, expression.getType())) {
+			String exceptionMessage = String.format(
+					"Incompatible types! %s doesn't match %s", identifierType,
+					expression.getType());
 			throw new InvalidFunctionException(exceptionMessage);
 		}
 	}
-	
-	public Variable findVariableByIdentifier(String variableName){
-		if(!scopeStack.isEmpty() && getCurrentScope().getVariable().get(variableName) != null){
+
+	public Variable findVariableByIdentifier(String variableName) {
+		if (!scopeStack.isEmpty()
+				&& getCurrentScope().getVariable().get(variableName) != null) {
 			return getCurrentScope().getVariable().get(variableName);
-		}else{
+		} else {
 			return variables.get(variableName);
 		}
 
 	}
-	
-	public void validateVariableName(String variableName) throws InvalidVariableException{
-		if (!checkVariableExistence(variableName)){
-			throw new InvalidVariableException("Variable doesn't exist"); 
+
+	public void validateVariableName(String variableName)
+			throws InvalidVariableException {
+		if (!checkVariableExistence(variableName)) {
+			throw new InvalidVariableException("Variable doesn't exist");
 		}
 	}
-	
-	public void addSupertype(String className, String superClassName) throws InvalidTypeException{
+
+	public void addSupertype(String className, String superClassName)
+			throws InvalidTypeException {
 		if (superClassName != null) {
-			if (tiposCompativeis.containsKey(superClassName)){
+			if (tiposCompativeis.containsKey(superClassName)) {
 				tiposCompativeis.get(superClassName).add(className);
 				return;
 			}
-			
+
 			throw new InvalidTypeException("Superclass doesn't exist");
 		}
 	}
-	
-	private void checkTestingExpression(Expression le, String operator,  Expression re) throws InvalidOperatorException, InvalidOperationException{
+
+	private void checkTestingExpression(Expression le, String operator,
+			Expression re) throws InvalidOperatorException,
+			InvalidOperationException {
 		// operador eh valido
-		if (!testingOperators.contains(operator)){
-			String message = String.format("This operator: %s is not allowed for testing operations.", operator); 
+		if (!testingOperators.contains(operator)) {
+			String message = String.format(
+					"This operator: %s is not allowed for testing operations.",
+					operator);
 			throw new InvalidOperatorException(message);
 		}
 		// exp sao de tipos equivalentes
 		if (!checkTypeCompatibility(le.getType(), re.getType())
-				&& !checkTypeCompatibility(re.getType(), le.getType())){
-			String message = String.format("This testing operation ( %s ) is not avaiable for the types %s and %s", operator, le.getType(), re.getType()); 
+				&& !checkTypeCompatibility(re.getType(), le.getType())) {
+			String message = String
+					.format("This testing operation ( %s ) is not avaiable for the types %s and %s",
+							operator, le.getType(), re.getType());
 			throw new InvalidOperationException(message);
 		}
 	}
-	
-	public void validateIfElseStatement(Expression exp) throws InvalidIfStatementException{
-		if(exp == null || !exp.getType().equals(new Type("boolean"))){
-			throw new InvalidIfStatementException("The given expression's type: "+exp.getType() +" isn't valid for a IF/ELSE statement.A boolean is required");
+
+	public void validateIfElseStatement(Expression exp)
+			throws InvalidIfStatementException {
+		if (exp == null || !exp.getType().equals(new Type("boolean"))) {
+			throw new InvalidIfStatementException(
+					"The given expression's type: "
+							+ exp.getType()
+							+ " isn't valid for a IF/ELSE statement.A boolean is required");
 		}
 	}
-	
-	public Expression getTestingExpression(Expression le, String op,  Expression re) throws InvalidOperationException, InvalidOperatorException{
+
+	public boolean verifyCall(String funcName, ArrayList<Expression> args)
+			throws InvalidFunctionCallException {
+
+		for (Function f : functions) {
+			if (f.getName().equals(funcName)) {
+				ArrayList<Parameter> p = (ArrayList<Parameter>) f.getParams();
+				if (p.size() != args.size()) {
+					throw new InvalidFunctionCallException(
+							"The method call of " + funcName
+									+ " has incorrect number of arguments");
+				}
+				for (int i = 0; i < p.size(); i++) {
+					if (!p.get(i).getType().getName()
+							.equals(args.get(i).getType().getName())) {
+						throw new InvalidFunctionCallException(
+								"The method call of " + funcName
+										+ " expects a "
+										+ p.get(i).getType().getName()
+										+ " but got the type "
+										+ args.get(i).getType().getName());
+					}
+				}
+				return true;
+			}
+		}
+		throw new InvalidFunctionCallException("The function " + funcName
+				+ " may have not been declared");
+	}
+
+	public Expression getTestingExpression(Expression le, String op,
+			Expression re) throws InvalidOperationException,
+			InvalidOperatorException {
 		checkTestingExpression(le, op, re);
 		Boolean result = false;
-		if (checkTypeCompatibility(le.getType(), re.getType()) || checkTypeCompatibility(re.getType(), le.getType())){
+		if (checkTypeCompatibility(le.getType(), re.getType())
+				|| checkTypeCompatibility(re.getType(), le.getType())) {
 			switch (op) {
-				case "!=":
-					result = calculator.getNotEqualBooleanValue(le, re, op);
-					break;
-				case "==":
-					result = calculator.getEqualBooleanValue(le, re, op);
-					break;
-				case ">=":
-					result = calculator.getGreaterThanOrEqualBooleanValue(le, re, op);
-					break;
-				case "<=":
-					result = calculator.getLessThanEqualBooleanValue(le, re, op);
-					break;
-				case ">":
-					result = calculator.getGreaterThanBooleanValue(le, re, op);
-					break;
-				case "<":
-					result = calculator.getLessThanBooleanValue(le, re, op);
-					break;
-				default:
-					throw new InvalidOperationException("Operation doesn't exist");
-			}
-		}
-		return result? new Expression(new Type("boolean"), "1"): new Expression(new Type("boolean"), "0");
-		
-	}
-	/* Auxiliary functions*/
-	
-	public void addVariableToTempList(Variable var){
-		tempVariables.add(var);
-	}
-	
-	public CodeGenerator getCodeGenerator(){
-		return codeGenerator;
-	}
-	
-	public void generateIfCode() {
-		String op = currentOperator;
-		switch (op) {
 			case "!=":
-				codeGenerator.generateBEQZCode(2);
+				result = calculator.getNotEqualBooleanValue(le, re, op);
 				break;
 			case "==":
-				codeGenerator.generateBNEQZCode(2);
+				result = calculator.getEqualBooleanValue(le, re, op);
 				break;
 			case ">=":
-				codeGenerator.generateBLTZCode(2);	
+				result = calculator.getGreaterThanOrEqualBooleanValue(le, re,
+						op);
 				break;
 			case "<=":
-				codeGenerator.generateBGTZCode(2);
+				result = calculator.getLessThanEqualBooleanValue(le, re, op);
 				break;
 			case ">":
-				codeGenerator.generateBLEQZCode(2);
+				result = calculator.getGreaterThanBooleanValue(le, re, op);
 				break;
 			case "<":
-				codeGenerator.generateBGEQZCode(2);
+				result = calculator.getLessThanBooleanValue(le, re, op);
 				break;
+			default:
+				throw new InvalidOperationException("Operation doesn't exist");
+			}
+		}
+		return result ? new Expression(new Type("boolean"), "1")
+				: new Expression(new Type("boolean"), "0");
+
+	}
+
+	/* Auxiliary functions */
+
+	public void addVariableToTempList(Variable var) {
+		tempVariables.add(var);
+	}
+
+	public CodeGenerator getCodeGenerator() {
+		return codeGenerator;
+	}
+
+	public void generateIfCode() {
+		String op = currentOperator;
+		System.out.println("O OP: "+op);
+		switch (op) {
+		case "!=":
+			codeGenerator.generateBEQZCode(2);
+			break;
+		case "==":
+			codeGenerator.generateBNEQZCode(2);
+			break;
+		case ">=":
+			codeGenerator.generateBLTZCode(2);
+			break;
+		case "<=":
+			codeGenerator.generateBGTZCode(2);
+			break;
+		case ">":
+			codeGenerator.generateBLEQZCode(2);
+			break;
+		case "<":
+			System.out.println();
+			codeGenerator.generateBGEQZCode(2);
+			break;
 		}
 	}
-	
-	public void generateBaseOpRelationalCode(String op, Expression e1, Expression e2) throws InvalidOperationException {
+
+	public void generateBaseOpRelationalCode(String op, Expression e1,
+			Expression e2) throws InvalidOperationException {
 		Boolean result;
 		Register r;
-		if (checkTypeCompatibility(e1.getType(), e2.getType()) || checkTypeCompatibility(e2.getType(), e1.getType())){
+		if (checkTypeCompatibility(e1.getType(), e2.getType())
+				|| checkTypeCompatibility(e2.getType(), e1.getType())) {
 			switch (op) {
-				case "!=":
-					currentOperator = "!=";
-					codeGenerator.generateSUBCode();
-					codeGenerator.generateBEQZCode(3);
-					r = codeGenerator.generateLDCode(new Expression(new Type("boolean"), "#1"));
-					codeGenerator.generateBRCode(2);
-					codeGenerator.generateLDCode(r, new Expression(new Type("boolean"), "#0"));
-					break;
-				case "==":
-					currentOperator = "==";
-					codeGenerator.generateSUBCode();
-					codeGenerator.generateBNEQZCode(3);
-					r = codeGenerator.generateLDCode(new Expression(new Type("boolean"), "#1"));
-					codeGenerator.generateBRCode(2);
-					codeGenerator.generateLDCode(r, new Expression(new Type("boolean"), "#0"));
-					break;
-				case ">=":
-					currentOperator = ">=";
-					codeGenerator.generateSUBCode();
-					codeGenerator.generateBLTZCode(3);	
-					r = codeGenerator.generateLDCode(new Expression(new Type("boolean"), "#1"));
-					codeGenerator.generateBRCode(2);
-					codeGenerator.generateLDCode(r, new Expression(new Type("boolean"), "#0"));
-					break;
-				case "<=":
-					currentOperator = "<=";
-					codeGenerator.generateSUBCode();
-					codeGenerator.generateBGTZCode(3);
-					r = codeGenerator.generateLDCode(new Expression(new Type("boolean"), "#1"));
-					codeGenerator.generateBRCode(2);
-					codeGenerator.generateLDCode(r, new Expression(new Type("boolean"), "#0"));
-					break;
-				case ">":
-					currentOperator = ">";
-					codeGenerator.generateSUBCode();
-					codeGenerator.generateBLEQZCode(3);
-					r = codeGenerator.generateLDCode(new Expression(new Type("boolean"), "#1"));
-					codeGenerator.generateBRCode(2);
-					codeGenerator.generateLDCode(r, new Expression(new Type("boolean"), "#0"));
-					break;
-				case "<":
-					currentOperator = "<";
-					codeGenerator.generateSUBCode();
-					codeGenerator.generateBGEQZCode(3);
-					r = codeGenerator.generateLDCode(new Expression(new Type("boolean"), "#1"));
-					codeGenerator.generateBRCode(2);
-					codeGenerator.generateLDCode(r, new Expression(new Type("boolean"), "#0"));
-					break;
-				default:
-					throw new InvalidOperationException("Operation doesn't exist");
+			case "!=":
+				currentOperator = "!=";
+				codeGenerator.generateSUBCode();
+				codeGenerator.generateBEQZCode(3);
+				r = codeGenerator.generateLDCode(new Expression(new Type(
+						"boolean"), "#1"));
+				codeGenerator.generateBRCode(2);
+				codeGenerator.generateLDCode(r, new Expression(new Type(
+						"boolean"), "#0"));
+				break;
+			case "==":
+				currentOperator = "==";
+				codeGenerator.generateSUBCode();
+				codeGenerator.generateBNEQZCode(3);
+				r = codeGenerator.generateLDCode(new Expression(new Type(
+						"boolean"), "#1"));
+				codeGenerator.generateBRCode(2);
+				codeGenerator.generateLDCode(r, new Expression(new Type(
+						"boolean"), "#0"));
+				break;
+			case ">=":
+				currentOperator = ">=";
+				codeGenerator.generateSUBCode();
+				codeGenerator.generateBLTZCode(3);
+				r = codeGenerator.generateLDCode(new Expression(new Type(
+						"boolean"), "#1"));
+				codeGenerator.generateBRCode(2);
+				codeGenerator.generateLDCode(r, new Expression(new Type(
+						"boolean"), "#0"));
+				break;
+			case "<=":
+				currentOperator = "<=";
+				codeGenerator.generateSUBCode();
+				codeGenerator.generateBGTZCode(3);
+				r = codeGenerator.generateLDCode(new Expression(new Type(
+						"boolean"), "#1"));
+				codeGenerator.generateBRCode(2);
+				codeGenerator.generateLDCode(r, new Expression(new Type(
+						"boolean"), "#0"));
+				break;
+			case ">":
+				currentOperator = ">";
+				System.out.println("Entrou no certo");
+				codeGenerator.generateSUBCode();
+				codeGenerator.generateBLEQZCode(3);
+				r = codeGenerator.generateLDCode(new Expression(new Type(
+						"boolean"), "#1"));
+				codeGenerator.generateBRCode(2);
+				codeGenerator.generateLDCode(r, new Expression(new Type(
+						"boolean"), "#0"));
+				break;
+			case "<":
+				currentOperator = "<";
+				codeGenerator.generateSUBCode();
+				codeGenerator.generateBGEQZCode(3);
+				r = codeGenerator.generateLDCode(new Expression(new Type(
+						"boolean"), "#1"));
+				codeGenerator.generateBRCode(2);
+				codeGenerator.generateLDCode(r, new Expression(new Type(
+						"boolean"), "#0"));
+				break;
+			default:
+				throw new InvalidOperationException("Operation doesn't exist");
 			}
 		}
 	}
-	
-	
+
 	public void generateBaseOpCode(String op, Expression e1, Expression e2) {
-		System.out.println("CHAAAAMMMOOOU "+op);
+		System.out.println("CHAAAAMMMOOOU " + op);
 		Operation operator = getOperator(op);
 		switch (operator) {
 		case AND_OP:
@@ -577,11 +734,11 @@ public class SemanticImpl{
 		default:
 			break;
 		}
-		
+
 	}
 
 	private Operation getOperator(String op) {
-		switch(op){
+		switch (op) {
 		case "+":
 			return Operation.PLUS;
 		case "-":
@@ -607,5 +764,4 @@ public class SemanticImpl{
 		}
 	}
 
-	
 }
