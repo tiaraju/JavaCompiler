@@ -254,7 +254,7 @@ end_option ::=
 	| SEMICOLON {: Logger.print("Line 241");:};
 
 if_statement ::= 
-	  IF LPAREN expression:exp RPAREN statement {: Logger.print("Line 244 - exp" + exp); SemanticImpl.getInstance().validateIfElseStatement((Expression)exp);:}
+	  IF LPAREN expression:exp RPAREN statement {: Logger.print("Line 244 - exp" + exp); SemanticImpl.getInstance().validateIfElseStatement((Expression)exp); SemanticImpl.getInstance().generateIfCode();:}
 	| IF LPAREN expression:exp RPAREN statement ELSE statement {: Logger.print("Line 251 - exp if else" + exp); SemanticImpl.getInstance().validateIfElseStatement((Expression)exp);:};
 
 statement_block ::= 
@@ -336,7 +336,7 @@ testing_option ::=
 testing_expression ::= 
 	expression:le testing_option:to expression:re {: Logger.print("Line 317");
 												  RESULT = SemanticImpl.getInstance().getTestingExpression((Expression) le, (String) to,  (Expression) re);
-												  SemanticImpl.getInstance().generateBaseOpRelCode((String) to, (Expression)le, (Expression) re);
+												  SemanticImpl.getInstance().generateBaseOpRelationalCode((String) to, (Expression)le, (Expression) re);
 												  :};
 
 try_statement ::= 

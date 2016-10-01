@@ -6,7 +6,6 @@ import compiler.generator.CodeGenerator;
 import compiler.util.Calculator;
 import compiler.util.Register;
 
-import java.awt.datatransfer.StringSelection;
 import java.util.*;
 
 
@@ -28,6 +27,7 @@ public class SemanticImpl{
 	private Program javaProgram;
 	static CodeGenerator codeGenerator;
 	private static Calculator calculator;
+	private static String currentOperator;
 	
 	public static SemanticImpl getInstance(){
 		if(singleton ==  null){
@@ -425,9 +425,34 @@ public class SemanticImpl{
 		}
 	}
 	
-	public Expression getTestingExpression(Expression le, String operator,  Expression re) throws InvalidOperationException, InvalidOperatorException{
-		checkTestingExpression(le, operator, re);
-		return new Expression(new Type("boolean"));
+	public Expression getTestingExpression(Expression le, String op,  Expression re) throws InvalidOperationException, InvalidOperatorException{
+		checkTestingExpression(le, op, re);
+		Boolean result = false;
+		if (checkTypeCompatibility(le.getType(), re.getType()) || checkTypeCompatibility(re.getType(), le.getType())){
+			switch (op) {
+				case "!=":
+					result = calculator.getNotEqualBooleanValue(le, re, op);
+					break;
+				case "==":
+					result = calculator.getEqualBooleanValue(le, re, op);
+					break;
+				case ">=":
+					result = calculator.getGreaterThanOrEqualBooleanValue(le, re, op);
+					break;
+				case "<=":
+					result = calculator.getLessThanEqualBooleanValue(le, re, op);
+					break;
+				case ">":
+					result = calculator.getGreaterThanBooleanValue(le, re, op);
+					break;
+				case "<":
+					result = calculator.getLessThanBooleanValue(le, re, op);
+					break;
+				default:
+					throw new InvalidOperationException("Operation doesn't exist");
+			}
+		}
+		return result? new Expression(new Type("boolean"), "1"): new Expression(new Type("boolean"), "0");
 		
 	}
 	/* Auxiliary functions*/
@@ -440,34 +465,89 @@ public class SemanticImpl{
 		return codeGenerator;
 	}
 	
-	public void generateBaseOpRelCode(String op, Expression e1, Expression e2) {
+	public void generateIfCode() {
+		String op = currentOperator;
 		switch (op) {
 			case "!=":
-				codeGenerator.generateSUBCode();
 				codeGenerator.generateBEQZCode(2);
 				break;
 			case "==":
-				codeGenerator.generateSUBCode();
 				codeGenerator.generateBNEQZCode(2);
 				break;
 			case ">=":
-				codeGenerator.generateSUBCode();
 				codeGenerator.generateBLTZCode(2);	
 				break;
 			case "<=":
-				codeGenerator.generateSUBCode();
 				codeGenerator.generateBGTZCode(2);
 				break;
 			case ">":
-				codeGenerator.generateSUBCode();
 				codeGenerator.generateBLEQZCode(2);
 				break;
 			case "<":
-				codeGenerator.generateSUBCode();
 				codeGenerator.generateBGEQZCode(2);
 				break;
 		}
 	}
+	
+	public void generateBaseOpRelationalCode(String op, Expression e1, Expression e2) throws InvalidOperationException {
+		Boolean result;
+		Register r;
+		if (checkTypeCompatibility(e1.getType(), e2.getType()) || checkTypeCompatibility(e2.getType(), e1.getType())){
+			switch (op) {
+				case "!=":
+					currentOperator = "!=";
+					codeGenerator.generateSUBCode();
+					codeGenerator.generateBEQZCode(3);
+					r = codeGenerator.generateLDCode(new Expression(new Type("boolean"), "#1"));
+					codeGenerator.generateBRCode(2);
+					codeGenerator.generateLDCode(r, new Expression(new Type("boolean"), "#0"));
+					break;
+				case "==":
+					currentOperator = "==";
+					codeGenerator.generateSUBCode();
+					codeGenerator.generateBNEQZCode(3);
+					r = codeGenerator.generateLDCode(new Expression(new Type("boolean"), "#1"));
+					codeGenerator.generateBRCode(2);
+					codeGenerator.generateLDCode(r, new Expression(new Type("boolean"), "#0"));
+					break;
+				case ">=":
+					currentOperator = ">=";
+					codeGenerator.generateSUBCode();
+					codeGenerator.generateBLTZCode(3);	
+					r = codeGenerator.generateLDCode(new Expression(new Type("boolean"), "#1"));
+					codeGenerator.generateBRCode(2);
+					codeGenerator.generateLDCode(r, new Expression(new Type("boolean"), "#0"));
+					break;
+				case "<=":
+					currentOperator = "<=";
+					codeGenerator.generateSUBCode();
+					codeGenerator.generateBGTZCode(3);
+					r = codeGenerator.generateLDCode(new Expression(new Type("boolean"), "#1"));
+					codeGenerator.generateBRCode(2);
+					codeGenerator.generateLDCode(r, new Expression(new Type("boolean"), "#0"));
+					break;
+				case ">":
+					currentOperator = ">";
+					codeGenerator.generateSUBCode();
+					codeGenerator.generateBLEQZCode(3);
+					r = codeGenerator.generateLDCode(new Expression(new Type("boolean"), "#1"));
+					codeGenerator.generateBRCode(2);
+					codeGenerator.generateLDCode(r, new Expression(new Type("boolean"), "#0"));
+					break;
+				case "<":
+					currentOperator = "<";
+					codeGenerator.generateSUBCode();
+					codeGenerator.generateBGEQZCode(3);
+					r = codeGenerator.generateLDCode(new Expression(new Type("boolean"), "#1"));
+					codeGenerator.generateBRCode(2);
+					codeGenerator.generateLDCode(r, new Expression(new Type("boolean"), "#0"));
+					break;
+				default:
+					throw new InvalidOperationException("Operation doesn't exist");
+			}
+		}
+	}
+	
 	
 	public void generateBaseOpCode(String op, Expression e1, Expression e2) {
 		System.out.println("CHAAAAMMMOOOU "+op);

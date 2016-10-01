@@ -189,6 +189,14 @@ public class CodeGenerator {
 		}
 		return r;
 	}
+	
+	public Register generateLDCode(Register r, Expression expression) {
+		if (expression.getAssemblyValue() != null) {
+			labels += 8;
+			addCode(labels + ": LD " + r + ", " + expression.getAssemblyValue());
+		}
+		return r;
+	}
 
 	public void generateSTCode(Variable variable) {
 		labels += 8;

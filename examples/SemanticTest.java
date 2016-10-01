@@ -1,9 +1,8 @@
 
 public class SemanticTest{
 	public void teste(){
-		int a = 22;
-		if(2 < 4) {
-			a = 5;
+		if(3 != 7){
+			int b = 2;
 		}
 	}	
 }
