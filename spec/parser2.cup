@@ -140,9 +140,8 @@ field_declaration ::= method_declaration {:Logger.print("Line 130");:}
 
 method_declaration ::=
     modifier_loop type:t IDENTIFIER:id LPAREN
-    parameter_list_opt:p RPAREN                                         {:Logger.print("Line 136 ");:}
+    parameter_list_opt:p RPAREN                                         {:Logger.print("Line 136 ");SemanticImpl.getInstance().validateFunction(id,(ArrayList<Parameter>) p,(Type)t);:}
     end_option:ep                                                       {:Logger.print("Line 136b");
-	                                                                      SemanticImpl.getInstance().validateFunction(id,(ArrayList<Parameter>) p,(Type)t);
                                                                           if(ep instanceof Expression){ SemanticImpl.getInstance().exitCurrentScope((Expression) ep);}
                                                                           else{  SemanticImpl.getInstance().exitCurrentScope();}
                                                                           SemanticImpl.getInstance().getCodeGenerator().addFunctionAddress(id);
@@ -177,8 +176,9 @@ modifier_loop ::= {:Logger.print("Line 154");:}
 				| modifier modifier_loop {:Logger.print("155");:}
 ;
 
-variable_declarator_loop ::= variable_declarator:var {:Logger.print("Line 158"); SemanticImpl.getInstance().addVariableToTempList((Variable)var); RESULT = var;:}
-							 | variable_declarator:var COMMA variable_declarator_loop {:Logger.print("Line 159"); SemanticImpl.getInstance().addVariableToTempList((Variable)var);:};
+variable_declarator_loop ::= 
+variable_declarator:var {:Logger.print("Line 158"); SemanticImpl.getInstance().addVariableToTempList((Variable)var); RESULT = var;:}
+|variable_declarator:var COMMA variable_declarator_loop {:Logger.print("Line 159"); SemanticImpl.getInstance().addVariableToTempList((Variable)var);:};
 
 variable_declarator ::= IDENTIFIER:id brack_loop attr_opt:exp {:Logger.print("Line 161"); 
 																Variable temp = new Variable((String) id, new Type("null"), (Expression) exp);

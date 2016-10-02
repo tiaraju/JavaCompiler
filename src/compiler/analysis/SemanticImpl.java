@@ -138,7 +138,6 @@ public class SemanticImpl {
 	}
 
 	public void exitCurrentScope() throws InvalidFunctionException {
-		System.out.println("EH O OUTRO EXIT");
 		ScopedEntity scoped = scopeStack.pop();
 		checkDeclaredAndReturnedType(scoped.getName(),
 				((Function) scoped).getDeclaredReturnType(), null);
@@ -168,7 +167,6 @@ public class SemanticImpl {
 
 	public void exitCurrentScope(Expression exp)
 			throws InvalidFunctionException {
-		System.out.println("FOI NO EXIT SCOPE");
 		ScopedEntity scoped = scopeStack.pop();
 		if (scoped instanceof Function) {
 			if (exp != null) {
@@ -206,8 +204,7 @@ public class SemanticImpl {
 	}
 
 	public boolean checkVariableExistenceLocal(String variableName) {
-		if (!scopeStack.isEmpty()
-				&& getCurrentScope().getVariable().get(variableName) != null) {
+		if (!scopeStack.isEmpty() && getCurrentScope().getVariable().get(variableName) != null) {
 			return true;
 		} else {
 			return false;
@@ -219,7 +216,6 @@ public class SemanticImpl {
 	}
 
 	public void checkFunctionExistence(Function temp) throws InvalidFunctionException {
-		System.out.println("ta chegnado no check");
 		if (functions.contains(temp)) {
 			throw new InvalidFunctionException("ERROR: The function "
 					+ temp.getName() + " has already been declared!");
@@ -310,10 +306,10 @@ public class SemanticImpl {
 	 * @throws Exception
 	 */
 	private void addVariable(Variable variable) throws Exception {
+		System.out.println("Pkaspodkasd");
 		for (String v : variables.keySet()) {
 			// System.out.println(v);
 		}
-
 		if (scopeStack.isEmpty()) {
 			validateVariableGlobal(variable);
 
@@ -339,6 +335,8 @@ public class SemanticImpl {
 	}
 
 	public void validateFunction(String functionName, ArrayList<Parameter> params, Type declaredType) throws InvalidFunctionException, InvalidParameterException {
+		
+		
 		if (declaredType == null) {
 			throw new InvalidFunctionException(
 					"The function "
@@ -355,30 +353,33 @@ public class SemanticImpl {
 			checkExistingParameter(params);
 		}
 		temp.setDeclaredReturnedType(declaredType);
+		System.out.println("validated");
 		addFunctionAndNewScope(temp);
+		System.out.println("created");
 	}
 
-	private void hasReturn(Expression exp) throws InvalidFunctionException {
-		if (!exp.getContext().equalsIgnoreCase("return")) {
-			throw new InvalidFunctionException("Missing a return statement");
-		}
+	private boolean hasReturn(Expression exp) throws InvalidFunctionException {
+		return exp.getContext().equalsIgnoreCase("return");
 	}
 
 	private void checkDeclaredAndReturnedType(String functionName,
 			Type declaredType, Expression exp) throws InvalidFunctionException {
-		System.out.println("checking declared and returned");
-		if(exp == null && !declaredType.equals(new Type("void"))){
-			throw new InvalidFunctionException("The function has no return statement");
-		}
+		if(exp == null && declaredType.equals(new Type("void"))){return;}
+		if(exp == null && !declaredType.equals(new Type("void"))){throw new InvalidFunctionException("Missing a return statement");}
 		if(!declaredType.equals(new Type("void"))){
-			hasReturn(exp);
+			if(!hasReturn(exp)){throw new InvalidFunctionException("Missing a return statement");}
+			if (!declaredType.equals(exp.getType())) {
+				throw new InvalidFunctionException("The function " + functionName
+						+ " didn't return the expected type: " + declaredType
+						+ ". It returns " + exp.getType() + " instead");
+			}
+		}else{
+			if(hasReturn(exp)){
+				if(exp.getType() != null){throw new InvalidFunctionException("A void function should not return a: "+exp.getType());} 
+			}
+			
 		}
 		
-		if (!declaredType.equals(exp.getType())) {
-			throw new InvalidFunctionException("The function " + functionName
-					+ " didn't return the expected type: " + declaredType
-					+ ". It returns " + exp.getType() + " instead");
-		}
 	}
 
 	private void checkExistingParameter(ArrayList<Parameter> params)
