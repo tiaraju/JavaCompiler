@@ -627,10 +627,19 @@ public class SemanticImpl {
 			codeGenerator.generateBLEQZCode(2);
 			break;
 		case "<":
-			System.out.println();
 			codeGenerator.generateBGEQZCode(2);
 			break;
+		case "true":
+			System.out.println("Entrou no true. Deal with it");
+			break;
+		case "false":
+			System.out.println("Entrou no false. Deal with it");
+			break;
 		}
+	}
+	
+	public void setCurrentOperator(boolean newCurrentOperator){
+		currentOperator = newCurrentOperator+"";
 	}
 
 	public void generateBaseOpRelationalCode(String op, Expression e1,
