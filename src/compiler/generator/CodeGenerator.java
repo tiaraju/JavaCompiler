@@ -21,10 +21,9 @@ public class CodeGenerator {
 	private Register[] registers;
 	private Map<String, Integer> functionAddres;
 	
-
 	public CodeGenerator() {
 		this.labels = 100;
-		this.register = -1;
+		this.register = 0;
 		this.registers = Register.values();
 		this.assemblyCode = initAssemblyCode();
 		this.functionAddres = new HashMap<String, Integer>();
@@ -40,7 +39,6 @@ public class CodeGenerator {
 
 	public void assignmentDeclaration(Variable var, Object obj) {
 		if (obj instanceof Expression) {
-			System.out.println("chegou no assignmenaisjdsjdt");
 			//generateLDCode((Expression) obj);
 			generateSTCode(var);
 		}
@@ -194,6 +192,18 @@ public class CodeGenerator {
 		return r;
 	}
 	
+	public Register generateLDCode(Variable var) {
+		Register r = null;
+		if (var.getIdentifier() != null) {
+//			System.out.println("Register before ld: "+register);
+			register++;
+			labels += 8;
+			r = allocateRegister();
+			addCode(labels + ": LD " + r + ", " + var.getIdentifier());
+		}
+		return r;
+	}
+	
 	public Register generateLDCode(Register r, Expression expression) {
 		if (expression.getAssemblyValue() != null) {
 			labels += 8;
@@ -205,63 +215,27 @@ public class CodeGenerator {
 	public void generateSTCode(Variable variable) {
 		labels += 8;
 		addCode(labels + ": ST " + variable.getIdentifier() + ", " + allocateRegister());
-		this.register = -1;
+		this.register = 0;
 	}
 
 	public void generateSTCode(Register one, Expression exp) {
 		labels += 8;
 		addCode(labels + ": ST " + one + ", " + exp.getAssemblyValue());
-		this.register = -1;
+		this.register = 0;
 	}
 
 	public void generateSTCode(Expression exp) {
 		labels += 8;
 		addCode(labels + ": ST " + exp.getAssemblyValue() + ", " + allocateRegister());
-		this.register = -1;
+		this.register = 0;
 	}
 
 	public void addCode(String assemblyString) {
 		assemblyCode += assemblyString + "\n";
-//		System.out.println("############################################### \n");
-//		System.out.println(getAssemblyCode());
-//		System.out.println("############################################### \n");
+		System.out.println("############################################### \n");
+		System.out.println(getAssemblyCode());
+		System.out.println("############################################### \n");
 	}
-
-//	public void addSwitch(Switch s) {
-//		if (s.getExpression().getAssemblyValue() != null) {
-//			register++;
-//			labels += 8;
-//			addCode(labels + ": LD " + s.getSentinel() + ", " + s.getExpression().getAssemblyValue());
-//		}
-//	}
-	
-	public void addOutSwitch(){
-		labels += 8;
-		addCode(labels + ": BR #switchSize");
-	}
-	
-//	public void addCase(Case c) {
-//		//System.out.println("Size of Case:" + c.getSize());
-//		register++;
-//		// int startLabel = labels;
-//		labels += 8;
-//		addCode(labels + ": LD " + allocateRegister() + ", " + c.getExpression().getAssemblyValue());
-//		labels += 8;
-//		addCode(labels + ": SUB " + allocateRegister() + ", " + allocateRegister() + ", " + c.getSentinel());
-//		labels += 8;
-//	
-//		if(c instanceof Default){
-//			addCode(labels + ": BLTZ " + allocateRegister() + ", #switchEnd");
-//			labels += 8;
-//			addCode(labels + ": BGTZ " + allocateRegister() + ", #switchEnd");
-//		}else{
-//			addCode(labels + ": BLTZ " + allocateRegister() + ", #caseEnd");
-//			labels += 8;
-//			addCode(labels + ": BGTZ " + allocateRegister() + ", #caseEnd");
-//			
-//		}
-//		register--;
-//	}
 
 	public void generateCallFunction(String functionName) {
 		Expression blockSize = new Expression("size");

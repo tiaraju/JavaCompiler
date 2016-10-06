@@ -306,7 +306,6 @@ public class SemanticImpl {
 	 * @throws Exception
 	 */
 	private void addVariable(Variable variable) throws Exception {
-		System.out.println("Pkaspodkasd");
 		for (String v : variables.keySet()) {
 			// System.out.println(v);
 		}
@@ -353,9 +352,7 @@ public class SemanticImpl {
 			checkExistingParameter(params);
 		}
 		temp.setDeclaredReturnedType(declaredType);
-		System.out.println("validated");
 		addFunctionAndNewScope(temp);
-		System.out.println("created");
 	}
 
 	private boolean hasReturn(Expression exp) throws InvalidFunctionException {
@@ -454,14 +451,11 @@ public class SemanticImpl {
 		if (!checkVariableExistence(id)) {
 			throw new InvalidVariableException("Variable doesn't exist");
 		}
-		// System.out.println(expression.getType());
 		if (!expression.getType().equals(new Type("null"))
 				&& !checkValidExistingType(expression.getType())) {
 			throw new InvalidTypeException("Type non existing");
 		}
-		// System.out.println("AD");
 		Type identifierType = findVariableByIdentifier(id).getType();
-		// System.out.println(identifierType.getName());
 		if (expression.getType().equals(new Type("null"))) {
 			return;
 		}
@@ -609,7 +603,6 @@ public class SemanticImpl {
 
 	public void generateIfCode() {
 		String op = currentOperator;
-		System.out.println("O OP: "+op);
 		switch (op) {
 		case "!=":
 			codeGenerator.generateBEQZCode(2);
@@ -646,10 +639,6 @@ public class SemanticImpl {
 			Expression e2) throws InvalidOperationException {
 		Boolean result;
 		Register r;
-		System.out.println("e1" + e1.getValue());
-		System.out.println("e2" + e2.getValue());
-		System.out.println("AQUIII");
-		System.out.println();
 		if (checkTypeCompatibility(e1.getType(), e2.getType())
 				|| checkTypeCompatibility(e2.getType(), e1.getType())) {
 			switch (op) {
@@ -720,7 +709,6 @@ public class SemanticImpl {
 	}
 
 	public void generateBaseOpCode(String op, Expression e1, Expression e2) {
-		System.out.println("CHAAAAMMMOOOU " + op);
 		Operation operator = getOperator(op);
 		switch (operator) {
 		case AND_OP:
@@ -776,5 +764,4 @@ public class SemanticImpl {
 			return Operation.PLUS;
 		}
 	}
-
 }
