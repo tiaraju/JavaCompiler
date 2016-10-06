@@ -627,7 +627,7 @@ public class SemanticImpl {
 			codeGenerator.generateBLEQZCode(2);
 			break;
 		case "<":
-			System.out.println();
+			System.out.println("nada");
 			codeGenerator.generateBGEQZCode(2);
 			break;
 		}
@@ -637,6 +637,10 @@ public class SemanticImpl {
 			Expression e2) throws InvalidOperationException {
 		Boolean result;
 		Register r;
+		System.out.println("e1" + e1.getValue());
+		System.out.println("e2" + e2.getValue());
+		System.out.println("AQUIII");
+		System.out.println();
 		if (checkTypeCompatibility(e1.getType(), e2.getType())
 				|| checkTypeCompatibility(e2.getType(), e1.getType())) {
 			switch (op) {
@@ -682,7 +686,6 @@ public class SemanticImpl {
 				break;
 			case ">":
 				currentOperator = ">";
-				System.out.println("Entrou no certo");
 				codeGenerator.generateSUBCode();
 				codeGenerator.generateBLEQZCode(3);
 				r = codeGenerator.generateLDCode(new Expression(new Type(

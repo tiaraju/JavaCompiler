@@ -293,7 +293,8 @@ expression ::= numeric_expression:ne {:Logger.print("Line 257, ne = "); RESULT =
               | THIS:th {: Logger.print("Line 267 ");RESULT = th;:}
               | IDENTIFIER:id {: Logger.print("Line 268 "); SemanticImpl.getInstance().validateVariableName(id); 
 						 				  Variable var = SemanticImpl.getInstance().findVariableByIdentifier((String) id);
-						 				  RESULT = var.getValue();:}
+						 				  RESULT = var.getValue();
+						 				  SemanticImpl.getInstance().getCodeGenerator().generateLDCode((Variable) var);:}
               | attribution:attr {: Logger.print(" Line 269 ");RESULT = attr;:}
               | LPAREN expression LPAREN {: Logger.print("LINE 270");:}
               | expression expression_end_option {: Logger.print("LINE 271");:};
