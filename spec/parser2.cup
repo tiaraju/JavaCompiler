@@ -434,7 +434,7 @@ switch_clausulas ::=
 
 literal_expression ::=  INTEGER_LITERAL:i {:RESULT = new Expression(new Type("int"), i.toString());Logger.print("Line 388, valor do I: "+i);:}
 						| FLOATING_POINT_LITERAL:f {:RESULT = new Expression(new Type("float"), f.toString());Logger.print("Line 389, valor do f: "+f);:}
-						| BOOLEAN_LITERAL:b {:RESULT = new Expression(new Type("boolean"), b.toString());Logger.print("Line 390, valor do B: "+b);:}
+						| BOOLEAN_LITERAL:b {:RESULT = new Expression(new Type("boolean"), b.toString());Logger.print("Line 390, valor do B: "+b);SemanticImpl.getInstance().setCurrentOperator(b);:}
 						| CHARACTER_LITERAL:c{:RESULT = new Expression(new Type("char"), c.toString());Logger.print("Line 391, valor do C: "+c);:}
                         | STRING_LITERAL:s {:RESULT = new Expression(new Type("string"), s.toString());Logger.print("Line 392, valor do S: "+s);:}
                         | NULL_LITERAL:n{:RESULT = new Expression(new Type("null"), "null");Logger.print("Line 393, valor do N: "+n);:}
