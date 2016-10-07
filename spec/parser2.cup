@@ -291,11 +291,12 @@ expression ::= numeric_expression:ne {:Logger.print("Line 257, ne = "); RESULT =
               | LPAREN expression:e1 RPAREN {: Logger.print("LINE 270");RESULT=e1;:}
               | expression:e2 expression_end_option {: Logger.print("LINE 271");RESULT=e2;:};
 
-attribution ::= IDENTIFIER:id EQ expression:e    {: Logger.print("Line 273 ");
+attribution ::= IDENTIFIER:id EQ expression:e    {: Logger.print("Line 273 " + e);
 	                                                if(e instanceof String){
 	                                                    SemanticImpl.getInstance().checkVariableAttribution(id, (String) e);
 	                                                    Variable var = SemanticImpl.getInstance().findVariableByIdentifier((String) id);
-    												    SemanticImpl.getInstance().getCodeGenerator().assignmentDeclaration((Variable)var,(Expression)e);
+    												    SemanticImpl.getInstance().getCodeGenerator().generateCallFunction((String)e);
+    												    SemanticImpl.getInstance().getCodeGenerator().generateSTCode((Variable)var);
 	                                                }else{
 	                                                    SemanticImpl.getInstance().checkVariableAttribution(id, (Expression) e);
 	                                                    Variable var = SemanticImpl.getInstance().findVariableByIdentifier((String) id);

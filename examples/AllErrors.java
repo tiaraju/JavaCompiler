@@ -18,6 +18,13 @@ public class AllErros {
 		}
 	}
 	
+	public int testReturnInt(){
+		return 2;
+	}
 	
-
+	public void testFuncoesDiferentes(){
+		boolean a;
+		a= testReturnInt();
+	}
+	
 }

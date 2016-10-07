@@ -8,6 +8,11 @@ public class SemanticTest{
 		return 10;
 	}
 	
+	public int testeExpression(){
+		int a = 10 + 6 + (8-9*568 - (9+34*6) - (100/5));
+		return a;
+	}
+	
 	public int teste(int a){
 		return 2;
 	}
@@ -56,5 +61,17 @@ public class SemanticTest{
 		}else{
 			a = 25;
 		}
+	}
+	
+	public String testReturnString(){
+		String e = "teste";
+		String ef = "teste";
+		ef=e;
+		return "a";
+	}
+	
+	public void testCallFunction(){
+		boolean bre;
+		bre = testReturnBoolean();
 	}
 }
