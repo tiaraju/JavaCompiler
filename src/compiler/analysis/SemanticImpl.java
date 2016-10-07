@@ -366,7 +366,7 @@ public class SemanticImpl {
 		if(exp == null && !declaredType.equals(new Type("void"))){throw new InvalidFunctionException("Missing a return statement");}
 		if(!declaredType.equals(new Type("void"))){
 			if(!hasReturn(exp)){throw new InvalidFunctionException("Missing a return statement");}
-			if (!declaredType.equals(exp.getType())) {
+			if (!declaredType.equals(exp.getType()) && !checkTypeCompatibility(declaredType,exp.getType())) {
 				throw new InvalidFunctionException("The function " + functionName
 						+ " didn't return the expected type: " + declaredType
 						+ ". It returns " + exp.getType() + " instead");

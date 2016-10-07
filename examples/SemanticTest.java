@@ -26,6 +26,14 @@ public class SemanticTest{
 		a = 10;
 	}
 	
+	public boolean testReturnBoolean(){
+		return a > 24;
+	}
+	
+	public long testCoercion(){
+		return 1;
+	}
+	
 	public void testRelational(){
 		boolean a = 10 <= 9;
 		boolean b = 10 < 9;
