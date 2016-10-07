@@ -265,14 +265,24 @@ public class CodeGenerator {
 
 	public void addFunctionAddress(String name) {
 		//labels += 300;
-		System.out.println("O label de "+name+" é: "+(labels-16));
-		functionAddres.put(name, labels - 16);
-		List<Function> funcs = SemanticImpl.getInstance().getFunctions();
+		//System.out.println("O label de "+name+" é: "+(labels+8));
+		functionAddres.put(name, labels + 8);
 		addCode("\n");
 	}
 	
+	public void generateResult(String name){
+		List<Function> funcs = SemanticImpl.getInstance().getFunctions();
+		for(Function f:funcs){
+			if(f.getName().equalsIgnoreCase(name)){
+				if(!f.getDeclaredReturnType().equals(new Type("void"))){
+					generateReturnCode();
+				}
+			}
+		}
+	}
+	
 	public void generateCallFunction(String functionName) {
-		Expression blockSize = new Expression("size");
+		Expression blockSize = new Expression("CallerSize");
 		Integer addressFunction = functionAddres.get(functionName);
 
 		generateADDCode(Register.SP, Register.SP, blockSize);

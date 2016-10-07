@@ -606,24 +606,31 @@ public class SemanticImpl {
 		String op = currentOperator;
 		switch (op) {
 		case "!=":
+			System.out.println("diff");
 			codeGenerator.generateBEQZCode(2);
 			break;
 		case "==":
+			System.out.println("eqeq");
 			codeGenerator.generateBNEQZCode(2);
 			break;
 		case ">=":
+			System.out.println("maioreq");
 			codeGenerator.generateBLTZCode(2);
 			break;
 		case "<=":
+			System.out.println("menoreq");
 			codeGenerator.generateBGTZCode(2);
 			break;
 		case ">":
+			System.out.println("maior");
 			codeGenerator.generateBLEQZCode(2);
 			break;
 		case "<":
+			System.out.println("menor");
 			codeGenerator.generateBGEQZCode(2);
 			break;
 		case "true":
+			System.out.println("diff");
 			System.out.println("Entrou no true. Deal with it");
 			break;
 		case "false":

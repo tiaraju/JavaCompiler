@@ -9,8 +9,9 @@ public class Expression {
 		this.type = t;
 	}
 	
-	public Expression(String name) {
+	public Expression(String value) {
 		type = new Type("UNKNOWN");
+		this.value = value;
 	}
 	
 	public Expression(Type t, String value) {

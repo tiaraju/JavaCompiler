@@ -135,11 +135,12 @@ field_declaration ::= method_declaration {:Logger.print("Line 130");:}
 				    | SEMICOLON {:Logger.print("Line 134");:};
 
 method_declaration ::=
-    modifier_loop type:t IDENTIFIER:id LPAREN {:SemanticImpl.getInstance().getCodeGenerator().addFunctionAddress(id);:}
-    parameter_list_opt:p RPAREN {:Logger.print("Line 136 ");SemanticImpl.getInstance().validateFunction(id,(ArrayList<Parameter>) p,(Type)t);:}
+    modifier_loop type:t IDENTIFIER:id LPAREN {::}
+    parameter_list_opt:p RPAREN {:Logger.print("Line 136 ");SemanticImpl.getInstance().validateFunction(id,(ArrayList<Parameter>) p,(Type)t);SemanticImpl.getInstance().getCodeGenerator().addFunctionAddress(id);:}
     end_option:ep       {:Logger.print("Line 136b");
                         if(ep instanceof Expression){ SemanticImpl.getInstance().exitCurrentScope((Expression) ep);}
-                        else{  SemanticImpl.getInstance().exitCurrentScope();}:};
+                        else{  SemanticImpl.getInstance().exitCurrentScope();}
+                        SemanticImpl.getInstance().getCodeGenerator().generateResult(id);:};
 
 method_call ::=  IDENTIFIER:id LPAREN   {:Logger.print("Line 144");:}
 				 arglist_opt:args RPAREN {: if(args != null){
