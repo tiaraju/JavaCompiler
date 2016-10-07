@@ -5,7 +5,6 @@ import compiler.exceptions.InvalidFunctionException;
 import java.util.ArrayList;
 import java.util.List;
 
-
 public class Function extends ScopedEntity{
 	
 

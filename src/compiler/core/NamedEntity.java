@@ -1,12 +1,5 @@
 package compiler.core;
 
-/**
-<<<<<<< HEAD
- * Created by rodrigofarias on 9/22/16.
-=======
- * Created by rodrigofarias on 9/23/16.
->>>>>>> 2541fc0a84ad7bbdd1791c81aa5a1822b02e3665
- */
 public class NamedEntity {
     private String name;
 

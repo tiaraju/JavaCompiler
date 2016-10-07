@@ -30,7 +30,6 @@ public class CodeGenerator {
 	}
 
 	public static Object getInstance() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 	private String initAssemblyCode() {
@@ -39,7 +38,6 @@ public class CodeGenerator {
 
 	public void assignmentDeclaration(Variable var, Object obj) {
 		if (obj instanceof Expression) {
-			//generateLDCode((Expression) obj);
 			generateSTCode(var);
 		}
 		if (obj instanceof Function) {
@@ -313,6 +311,5 @@ public class CodeGenerator {
 		BufferedWriter writer = new BufferedWriter(new FileWriter(new File("assembly.txt")));
 		writer.write(assemblyCode);
 		writer.close();
-	}
-	
+	}	
 }

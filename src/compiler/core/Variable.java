@@ -41,12 +41,8 @@ public class Variable implements Parameter{
 		this.type = type;
 	}
 	
-	
-	
-	
 	@Override
 	public String toString(){
 		return this.identifier + " of type: " + getType().getName();
 	}
-
 }

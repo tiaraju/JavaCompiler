@@ -14,7 +14,7 @@ import compiler.core.Program;
 import compiler.core.ScopedEntity;
 import compiler.core.Type;
 import compiler.core.Variable;
-import compiler.exception.InvalidFunctionCallException;
+import compiler.exceptions.InvalidFunctionCallException;
 import compiler.exceptions.InvalidFunctionException;
 import compiler.exceptions.InvalidIfStatementException;
 import compiler.exceptions.InvalidOperationException;
@@ -306,9 +306,6 @@ public class SemanticImpl {
 	 * @throws Exception
 	 */
 	private void addVariable(Variable variable) throws Exception {
-		for (String v : variables.keySet()) {
-			// System.out.println(v);
-		}
 		if (scopeStack.isEmpty()) {
 			validateVariableGlobal(variable);
 
@@ -637,7 +634,6 @@ public class SemanticImpl {
 
 	public void generateBaseOpRelationalCode(String op, Expression e1,
 			Expression e2) throws InvalidOperationException {
-		Boolean result;
 		Register r;
 		if (checkTypeCompatibility(e1.getType(), e2.getType())
 				|| checkTypeCompatibility(e2.getType(), e1.getType())) {

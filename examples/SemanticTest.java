@@ -4,7 +4,7 @@ public class SemanticTest{
 	int a = 10;
 	
 	public int teste(){
-		int a = 10;
+		int a = 10 + 6;
 		return 10;
 	}
 	
@@ -39,6 +39,7 @@ public class SemanticTest{
 		if(10<9){
 			int a = 10;
 		}
+		testRelational();
 	}
 	
 	public void testIfElse(){

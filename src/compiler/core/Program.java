@@ -2,10 +2,6 @@ package compiler.core;
 
 import java.util.HashMap;
 
-/**
- *
- * Created by rodrigofarias on 9/23/16.
- */
 public class Program extends ScopedEntity {
     HashMap<String, Function> functions;
 
@@ -21,5 +17,4 @@ public class Program extends ScopedEntity {
     public void addFunction(Function f) {
         functions.put(f.getName(), f);
     }
-
 }

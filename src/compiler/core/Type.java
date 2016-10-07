@@ -1,8 +1,6 @@
 package compiler.core;
 
-
 public class Type{
-
 	private String typeName;
 
 	public Type(String typeName) {
@@ -23,5 +21,4 @@ public class Type{
 	public String toString(){
 		return getName();
 	}
-
 }

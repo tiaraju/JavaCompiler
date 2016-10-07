@@ -3,9 +3,6 @@ package compiler.core;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Created by rodrigofarias on 9/22/16.
- */
 public class ScopedEntity extends NamedEntity {
 
     private HashMap<String, Variable> variables;
@@ -31,5 +28,4 @@ public class ScopedEntity extends NamedEntity {
     public Map<String, Type> getTypes() {
         return types;
     }
-
 }

@@ -87,12 +87,10 @@ type_specifier ::=
 | entity_name:en {:Logger.print("Line 84");Type t = new Type((String) en); RESULT = t;:};
 
 compilation_unit ::=
-   package_declaration_opt import_statement_loop type_declaration {: Logger.print("Line 87");:}
-;
+   package_declaration_opt import_statement_loop type_declaration {: Logger.print("Line 87");:};
 
 package_declaration ::=
-   PACKAGE entity_name SEMICOLON {:Logger.print("Line 91");:}
-;
+   PACKAGE entity_name SEMICOLON {:Logger.print("Line 91");:};
 
 package_declaration_opt ::=  {:Logger.print("Line 94");:}
 							| package_declaration {:Logger.print("95");:};
@@ -100,19 +98,17 @@ package_declaration_opt ::=  {:Logger.print("Line 94");:}
 //import
 
 import_statement_loop ::=	{:Logger.print("Line 99");:}
-    						| import_statement import_statement_loop {:Logger.print("100");:}
-;
+    						| import_statement import_statement_loop {:Logger.print("100");:};
 
 import_statement ::=
-					IMPORT import_aux SEMICOLON {:Logger.print("103");:}
-;
+					IMPORT import_aux SEMICOLON {:Logger.print("103");:};
 
 import_aux ::=
 			  entity_name DOT MULT {:Logger.print("107");:}
-			| entity_name {:Logger.print("Line 109");:}
-;
+			| entity_name {:Logger.print("Line 109");:};
 
-//type   
+//type  
+
 type_declaration ::=  class_declaration  {:Logger.print("Line 113");:}
 					| interface_declaration {:Logger.print("Line 114");:};
 
@@ -140,13 +136,12 @@ field_declaration ::= method_declaration {:Logger.print("Line 130");:}
 
 method_declaration ::=
     modifier_loop type:t IDENTIFIER:id LPAREN
-    parameter_list_opt:p RPAREN                                         {:Logger.print("Line 136 ");SemanticImpl.getInstance().validateFunction(id,(ArrayList<Parameter>) p,(Type)t);:}
-    end_option:ep                                                       {:Logger.print("Line 136b");
-                                                                          if(ep instanceof Expression){ SemanticImpl.getInstance().exitCurrentScope((Expression) ep);}
-                                                                          else{  SemanticImpl.getInstance().exitCurrentScope();}
-                                                                          SemanticImpl.getInstance().getCodeGenerator().addFunctionAddress(id);
-                                                                          :}
-;
+    parameter_list_opt:p RPAREN {:Logger.print("Line 136 ");SemanticImpl.getInstance().validateFunction(id,(ArrayList<Parameter>) p,(Type)t);:}
+    end_option:ep       {:Logger.print("Line 136b");
+                        if(ep instanceof Expression){ SemanticImpl.getInstance().exitCurrentScope((Expression) ep);}
+                        else{  SemanticImpl.getInstance().exitCurrentScope();}
+                        SemanticImpl.getInstance().getCodeGenerator().addFunctionAddress(id);:};
+
 method_call ::=  IDENTIFIER:id LPAREN   {:Logger.print("Line 144");:}
 				 arglist_opt:args RPAREN {: if(args != null){
                      							Logger.print("Line 164");
@@ -174,12 +169,13 @@ modifier ::=  PUBLIC {:Logger.print("Line 143");:}
 			| TRANSIENT {:Logger.print("Line 152");:};
 
 modifier_loop ::= {:Logger.print("Line 154");:} 
-				| modifier modifier_loop {:Logger.print("155");:}
-;
+				| modifier modifier_loop {:Logger.print("155");:};
 
 variable_declarator_loop ::= 
-variable_declarator:var {:Logger.print("Line 158"); SemanticImpl.getInstance().addVariableToTempList((Variable)var); RESULT = var;:}
-|variable_declarator:var COMMA variable_declarator_loop {:Logger.print("Line 159"); SemanticImpl.getInstance().addVariableToTempList((Variable)var);:};
+				variable_declarator:var 
+					{:Logger.print("Line 158"); SemanticImpl.getInstance().addVariableToTempList((Variable)var); RESULT = var;:}
+				| variable_declarator:var COMMA variable_declarator_loop 
+					{:Logger.print("Line 159"); SemanticImpl.getInstance().addVariableToTempList((Variable)var);:};
 
 variable_declarator ::= IDENTIFIER:id brack_loop attr_opt:exp {:Logger.print("Line 161"); 
 																Variable temp = new Variable((String) id, new Type("null"), (Expression) exp);
@@ -187,16 +183,14 @@ variable_declarator ::= IDENTIFIER:id brack_loop attr_opt:exp {:Logger.print("Li
 																RESULT = temp;:};
 
 attr_opt ::= {:Logger.print("Line 163");:}
-			| EQ variable_initializer:exp {:Logger.print("164 " + exp); RESULT = exp;:}
-			;
+			| EQ variable_initializer:exp {:Logger.print("Line 162 "); RESULT = exp;:};
 
-variable_initializer ::=   expression:e {:Logger.print("Line 167 - Teste de Exp " +e); RESULT = e;:}
+variable_initializer ::=   expression:e {:Logger.print("Line 167"); RESULT = e;:}
 						 | LBRACE variable_initializer_opt RBRACE {:Logger.print("Line 168");:} //isso aqui tem como retornar uma expression? se nao, vai quebrar no value de variable
 						 | IDENTIFIER:id {:Logger.print("Line 170"); 
 						 				  SemanticImpl.getInstance().validateVariableName(id); 
 						 				  Variable var = SemanticImpl.getInstance().findVariableByIdentifier((String) id);
-						 				  RESULT = var.getValue();:}
-						 ;
+						 				  RESULT = var.getValue();:};
 
 variable_initializer_opt ::= {:Logger.print("Line 172");:}
 							| variable_initializer_loop comma_opt {:Logger.print("Line 173");:};
@@ -216,7 +210,7 @@ brack_loop ::= {:Logger.print("Line 185");:}
 
 type ::= type_specifier:t brack_loop {:Logger.print("Line 188"); RESULT = t;:};
 
-parameter ::= type:t IDENTIFIER:id brack_loop {:Logger.print("Line 189 "+t); RESULT = new Variable(id,(Type)t);:};
+parameter ::= type:t IDENTIFIER:id brack_loop {:Logger.print("Line 189 "); RESULT = new Variable(id,(Type)t);:};
 
 parameter_list_opt ::= {:Logger.print("Line 192");:} 
 					| parameter_list:pl {:Logger.print("Line 193"); RESULT = pl;:};
@@ -227,26 +221,23 @@ parameter_list ::= parameter:p {:Logger.print("Line 195"); RESULT =  ListCreator
 extends_interface_declaration_opt ::= {:Logger.print("Line 198");:} 
 									| EXTENDS implements_loop {:Logger.print("Line 199");:};
 
-interface_declaration ::= modifier_loop INTERFACE IDENTIFIER extends_interface_declaration_opt LBRACE field_declaration_loop RBRACE {:Logger.print("Line 201");:};
+interface_declaration ::= modifier_loop INTERFACE IDENTIFIER extends_interface_declaration_opt LBRACE 										field_declaration_loop RBRACE {:Logger.print("Line 201");:};
 
 field_declaration_loop ::= 
 	{:Logger.print("Line 204");:}
-    | field_declaration:fd field_declaration_loop {:Logger.print("Line 205");RESULT = fd;:}
-;
+    | field_declaration:fd field_declaration_loop {:Logger.print("Line 205");RESULT = fd;:};
 
 field_declaration ::=
     | method_declaration {:Logger.print("209");:}
     | constructor_declaration {:Logger.print("210");:}
     | variable_declaration {:Logger.print("211");:}
-    | static_initializer {:Logger.print("212");:}
-;
+    | static_initializer {:Logger.print("212");:};
 
 statement_block ::= LBRACE RBRACE {:Logger.print("Line 217");:}
 	| LBRACE statement_loop:st RBRACE {:Logger.print("Line 216"); RESULT = st;:};
 
-
 statement ::= variable_declaration:vd {: Logger.print("Line 218 "); RESULT = vd;:}
-              | expression:e SEMICOLON {: Logger.print("Line 219 "+e);RESULT = e;:}
+              | expression:e SEMICOLON {: Logger.print("Line 219 ");RESULT = e;:}
               | statement_block:stb {: Logger.print("Line 220 ");RESULT = stb;:}
               | if_statement:ist {: Logger.print("Line 221");RESULT = ist;:}
               | do_statement:dstm {: Logger.print("Line 222");RESULT = dstm;:}
@@ -255,7 +246,7 @@ statement ::= variable_declaration:vd {: Logger.print("Line 218 "); RESULT = vd;
               | try_statement {: Logger.print("Line 225");:}
               | switch_statement {: Logger.print("Line 226");:}
               | SYNCHRONIZED LPAREN expression RPAREN statement {: Logger.print("Line 227");:}
-              | RETURN expression_opt:ep SEMICOLON {: Logger.print("Line 99999999 >>>>> "+ep); ((Expression) ep).setContext("return");RESULT = ep;:}
+              | RETURN expression_opt:ep SEMICOLON {: Logger.print("Line 228"); ((Expression) ep).setContext("return");RESULT = ep;:}
               | RETURN SEMICOLON {: Logger.print("Line 99999999 ");:}
               | THROW expression SEMICOLON {: Logger.print("Line 229");:}
               | COLON statement {: Logger.print("Line 230");:}
@@ -263,7 +254,7 @@ statement ::= variable_declaration:vd {: Logger.print("Line 218 "); RESULT = vd;
               | CONTINUE identifier_opt SEMICOLON {: Logger.print("Line 232");:}
               | SEMICOLON {: Logger.print("Line 233");:};
 
-statement_loop ::= statement:st {: Logger.print("Line 237 "+ st); RESULT = st;:}
+statement_loop ::= statement:st {: Logger.print("Line 237 "); RESULT = st;:}
 				|statement_loop statement:st {: Logger.print("Line 237b "); RESULT = st;:};
 
 end_option ::= 
@@ -271,11 +262,11 @@ end_option ::=
 	| SEMICOLON {: Logger.print("Line 241");:};
 
 if_statement ::= 
-	  IF LPAREN expression:exp RPAREN statement {: Logger.print("Line 244 - exp" + exp); SemanticImpl.getInstance().validateIfElseStatement((Expression)exp); SemanticImpl.getInstance().generateIfCode();:}
-	| IF LPAREN expression:exp RPAREN statement ELSE statement {: Logger.print("Line 251 - exp if else" + exp); SemanticImpl.getInstance().validateIfElseStatement((Expression)exp);:};
+	  IF LPAREN expression:exp RPAREN statement {: Logger.print("Line 244"); SemanticImpl.getInstance().validateIfElseStatement((Expression)exp); SemanticImpl.getInstance().generateIfCode();:}
+	| IF LPAREN expression:exp RPAREN statement ELSE statement {: Logger.print("Line 251"); SemanticImpl.getInstance().validateIfElseStatement((Expression)exp);:};
 
 statement_block ::= 
-	 LBRACE statement:st RBRACE {: Logger.print("Line 247 "+st); RESULT = st;:};	
+	 LBRACE statement:st RBRACE {: Logger.print("Line 247"); RESULT = st;:};	
 
 do_statement ::= DO statement WHILE LPAREN expression RPAREN COMMA {: Logger.print("Line 253");:};
 
@@ -287,9 +278,9 @@ expression ::= numeric_expression:ne {:Logger.print("Line 257, ne = "); RESULT =
               | bit_expression:be {: Logger.print("Line 260 ");RESULT = be;:}
               | casting_expression:ce {: Logger.print("Line 261 ");RESULT = ce;:}
               | creating_expression:cre {: Logger.print("Line 262 ");RESULT = cre;:}
-              | literal_expression:le {:Logger.print("Line 263, le = " + ((Expression)le).getValue()); RESULT = le; SemanticImpl.getInstance().getCodeGenerator().generateLDCode((Expression) le);:}
+              | literal_expression:le {:Logger.print("Line 263"); RESULT = le; SemanticImpl.getInstance().getCodeGenerator().generateLDCode((Expression) le);:}
               | logical_expression:lge {: Logger.print("Line 264 "); RESULT = lge;:}
-              | method_call:mc {:Logger.print("Line 351 "+ mc); RESULT = mc;:}
+              | method_call:mc {:Logger.print("Line 351"); RESULT = mc;:}
               | SUPER:sup {: Logger.print("Line 266 ");RESULT = sup;:}
               | THIS:th {: Logger.print("Line 267 ");RESULT = th;:}
               | IDENTIFIER:id {: Logger.print("Line 268 "); SemanticImpl.getInstance().validateVariableName(id); 
@@ -300,7 +291,7 @@ expression ::= numeric_expression:ne {:Logger.print("Line 257, ne = "); RESULT =
               | LPAREN expression:e1 LPAREN {: Logger.print("LINE 270");RESULT=e1;:}
               | expression:e2 expression_end_option {: Logger.print("LINE 271");RESULT=e2;:};
 
-attribution ::= IDENTIFIER:id EQ expression:e    {: Logger.print("Line 273 " + e);
+attribution ::= IDENTIFIER:id EQ expression:e    {: Logger.print("Line 273 ");
 	                                                if(e instanceof String){
 	                                                    SemanticImpl.getInstance().checkVariableAttribution(id, (String) e);
 	                                                    Variable var = SemanticImpl.getInstance().findVariableByIdentifier((String) id);
@@ -339,20 +330,22 @@ for_div_1 ::=
 	| expression:e SEMICOLON {: Logger.print(" Line 295");RESULT = e;:}
 	| SEMICOLON {: Logger.print("Line 296");:};
 
-numeric_expression ::= MINUS expression:e {: Logger.print("Line 298"); SemanticImpl.getInstance().isNumericExpression((Expression) e); RESULT = e;:}
-                       | numeric_option expression:e {: Logger.print("Line 299"); SemanticImpl.getInstance().isNumericExpression((Expression) e); RESULT=e;:}
-					   | expression:e numeric_option:no {:Logger.print("Line 300, numeric_option:" + "  "); SemanticImpl.getInstance().isNumericExpression((Expression) e); RESULT=e;:}
-					   | expression:le middle_operator:md expression:re {:Logger.print("Linha 302 "+ md); 
-					   													  SemanticImpl.getInstance().isNumericExpression((Expression) le,(Expression) re);
-					   													  SemanticImpl.getInstance().generateBaseOpCode((String) md, (Expression)le, (Expression) re);
-					   													  RESULT = SemanticImpl.getInstance().getExpression((Expression) le, (String) md, (Expression) re);:}
-					   ;
+numeric_expression ::= 
+	MINUS expression:e {: Logger.print("Line 298"); SemanticImpl.getInstance().isNumericExpression((Expression) 	e); RESULT = e;:}
+    | numeric_option expression:e {: Logger.print("Line 299"); 
+    	SemanticImpl.getInstance().isNumericExpression((Expression) e); RESULT=e;:}
+	| expression:e numeric_option:no {:Logger.print("Line 300"); 
+		SemanticImpl.getInstance().isNumericExpression((Expression) e); RESULT=e;:}
+	| expression:le middle_operator:md expression:re {:Logger.print("Line 302 "); 
+		SemanticImpl.getInstance().isNumericExpression((Expression) le,(Expression) re);
+		SemanticImpl.getInstance().generateBaseOpCode((String) md, (Expression)le, (Expression) re);
+		RESULT = SemanticImpl.getInstance().getExpression((Expression) le, (String) md, (Expression) re);:};
 
-expression_opt ::= expression:e {: Logger.print("Line 306 "+e); RESULT = e;:};
+expression_opt ::= expression:e {: Logger.print("Line 306 "); RESULT = e;:};
 
 testing_option ::= 
-	  GT:gt {: Logger.print("Line 309"+ gt); RESULT = ">";:}
-	| LT:lt {: Logger.print("Line 310" + lt); RESULT = "<";:}
+	  GT:gt {: Logger.print("Line 309"); RESULT = ">";:}
+	| LT:lt {: Logger.print("Line 310"); RESULT = "<";:}
 	| GTEQ:gteq {: Logger.print("Line 311"); RESULT = ">=";:}
 	| LTEQ:lteq {: Logger.print("Line 312"); RESULT = "<=";:}
 	| EQEQ:eqeq {: Logger.print("Line 313"); RESULT = "==";:}
@@ -379,7 +372,6 @@ logical_option ::=
 	| OROREQ {: Logger.print("Line 331");RESULT = "||=";:}
 	| MOD {: Logger.print("Line 332");RESULT = "%";:}
 	| MODEQ {: Logger.print("Line 333");RESULT = "%=";:};
-
 
 catch_loop ::= 
 	{: Logger.print("Line 337");:}
@@ -433,21 +425,26 @@ switch_clausulas ::=
 	| DEFAULT COLON {: Logger.print("Line 385");:}
 	| statement {: Logger.print("Line 386");:};
 
-literal_expression ::=  INTEGER_LITERAL:i {:RESULT = new Expression(new Type("int"), i.toString());Logger.print("Line 388, valor do I: "+i);:}
-						| FLOATING_POINT_LITERAL:f {:RESULT = new Expression(new Type("float"), f.toString());Logger.print("Line 389, valor do f: "+f);:}
-						| BOOLEAN_LITERAL:b {:RESULT = new Expression(new Type("boolean"), b.toString());Logger.print("Line 390, valor do B: "+b);SemanticImpl.getInstance().setCurrentOperator(b);:}
-						| CHARACTER_LITERAL:c{:RESULT = new Expression(new Type("char"), c.toString());Logger.print("Line 391, valor do C: "+c);:}
-                        | STRING_LITERAL:s {:RESULT = new Expression(new Type("string"), s.toString());Logger.print("Line 392, valor do S: "+s);:}
-                        | NULL_LITERAL:n{:RESULT = new Expression(new Type("null"), "null");Logger.print("Line 393, valor do N: "+n);:}
-                        ;
+literal_expression ::=  
+	INTEGER_LITERAL:i {:RESULT = new Expression(new Type("int"), i.toString());
+		Logger.print("Line 388");:}
+	| FLOATING_POINT_LITERAL:f {:RESULT = new Expression(new Type("float"), f.toString());
+		Logger.print("Line 389");:}
+	| BOOLEAN_LITERAL:b {:RESULT = new Expression(new Type("boolean"), b.toString());
+		Logger.print("Line 390");SemanticImpl.getInstance().setCurrentOperator(b);:}
+	| CHARACTER_LITERAL:c{:RESULT = new Expression(new Type("char"), c.toString());
+		Logger.print("Line 391");:}
+    | STRING_LITERAL:s {:RESULT = new Expression(new Type("string"), s.toString());
+    	Logger.print("Line 392");:}
+    | NULL_LITERAL:n{:RESULT = new Expression(new Type("null"), "null");
+    	Logger.print("Line 393");:};
 
 logical_expression ::= 
 	NOT expression {: Logger.print("Line 397");:}
-	| expression:e1 logical_option:lo expression:e2 {: Logger.print("Line 398 "+lo);
+	| expression:e1 logical_option:lo expression:e2 {: Logger.print("Line 398");
    													   RESULT = SemanticImpl.getInstance().getExpression((Expression) e1, (String) lo, (Expression) e2);:}
 	| expression QUESTION expression COLON expression {: Logger.print("Line 399");:}
-	| BOOLEAN_LITERAL:bl {:Logger.print("400 Ta Chegando em boolean_Literal "+bl); RESULT = new Expression(new Type("boolean"),bl.toString());:}
-	;
+	| BOOLEAN_LITERAL:bl {:Logger.print("Line 400"); RESULT = new Expression(new Type("boolean"),bl.toString());:};
 
 identifier_opt ::= 
 	{: Logger.print("Line 401");:}
@@ -466,4 +463,4 @@ arglist_opt ::= {: Logger.print("Line 449");:}
 expression_loop ::=
      expression:e 		                     {: Logger.print("Line 452"); RESULT =  ListCreator.newList(e);:}
      | expression:e COMMA expression_loop:el {: Logger.print("Line 453");((ArrayList<Expression>) el).add((Expression)e); RESULT = e;:}
-     ;     
+     ;
