@@ -253,7 +253,7 @@ public class SemanticImpl {
 	public boolean checkTypeOfAssignment(Variable variable, Expression exp)
 			throws InvalidTypeAssignmentException {
 		if (!variable.getType().equals(exp.getType())) {
-			throw new InvalidTypeAssignmentException("Alguma msg aqui");
+			throw new InvalidTypeAssignmentException("The expression type doesn't match the variable's");
 		}
 		return true;
 	}
@@ -284,10 +284,10 @@ public class SemanticImpl {
 	 */
 	private void validateVariable(Variable variable) throws Exception {
 		if (checkVariableExistenceLocal(variable.getIdentifier())) {
-			throw new InvalidVariableException("Name already exists");
+			throw new InvalidVariableException("The variable's identifier is already being used");
 		}
 		if (!checkValidExistingType(variable.getType())) {
-			throw new InvalidTypeException("Type non existing");
+			throw new InvalidTypeException("Non existing type");
 		}
 	}
 
@@ -296,7 +296,7 @@ public class SemanticImpl {
 			throw new InvalidVariableException("Name already exists");
 		}
 		if (!checkValidExistingType(variable.getType())) {
-			throw new InvalidTypeException("Type non existing");
+			throw new InvalidTypeException("The variable's identifier is already being used");
 		}
 	}
 
@@ -454,7 +454,7 @@ public class SemanticImpl {
 		}
 		if (!expression.getType().equals(new Type("null"))
 				&& !checkValidExistingType(expression.getType())) {
-			throw new InvalidTypeException("Type non existing");
+			throw new InvalidTypeException("Non existing type ");
 		}
 		Type identifierType = findVariableByIdentifier(id).getType();
 		if (expression.getType().equals(new Type("null"))) {
