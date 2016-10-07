@@ -5,8 +5,10 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import compiler.analysis.SemanticImpl;
 import compiler.core.Expression;
 import compiler.core.Function;
 import compiler.core.Type;
@@ -45,7 +47,7 @@ public class CodeGenerator {
 			generateLDCode(new Expression(f.getName()));
 			generateSTCode(var);
 		}
-		System.out.println(assemblyCode);
+		//System.out.println(assemblyCode);
 	}
 
 	public void generateADDCode() {
@@ -230,23 +232,18 @@ public class CodeGenerator {
 
 	public void addCode(String assemblyString) {
 		assemblyCode += assemblyString + "\n";
-		System.out.println("############################################### \n");
-		System.out.println(getAssemblyCode());
-		System.out.println("############################################### \n");
+//		System.out.println("############################################### \n");
+//		System.out.println(getAssemblyCode());
+//		System.out.println("############################################### \n");
 	}
 
-	public void generateCallFunction(String functionName) {
-		Expression blockSize = new Expression("size");
-		Integer addressFunction = functionAddres.get(functionName);
+	
 
-		generateADDCode(Register.SP, Register.SP, blockSize);
-
-		int jump = (3 * 8) + labels;
-		generateSTCode(Register._SP, new Expression(new Type("int"), Integer.toString(jump)));
-		generateBRCode(addressFunction);
-		generateSUBCode(Register._SP, Register.SP, blockSize);
+	public void generateReturnCode(){
+		labels+=8;
+		addCode(labels+ ": BR "+ "*0(SP)");
 	}
-
+	
 	public void generateBRCode(Integer address) {
 		labels += 8;
 		addCode(labels + ": BR " + address);
@@ -267,9 +264,24 @@ public class CodeGenerator {
 	}
 
 	public void addFunctionAddress(String name) {
-		labels += 300;
-		functionAddres.put(name, labels + 8);
+		//labels += 300;
+		System.out.println("O label de "+name+" é: "+(labels-16));
+		functionAddres.put(name, labels - 16);
+		List<Function> funcs = SemanticImpl.getInstance().getFunctions();
 		addCode("\n");
+	}
+	
+	public void generateCallFunction(String functionName) {
+		Expression blockSize = new Expression("size");
+		Integer addressFunction = functionAddres.get(functionName);
+
+		generateADDCode(Register.SP, Register.SP, blockSize);
+
+		int jump = (3 * 8) + labels;
+		generateSTCode(Register._SP, new Expression(new Type("int"), Integer.toString(jump)));
+		generateBRCode(addressFunction);
+		generateSUBCode(Register._SP, Register.SP, blockSize);
+	
 	}
 
 	public void StorageReturnedType(Function function, Expression returnedExpression) {

@@ -135,12 +135,11 @@ field_declaration ::= method_declaration {:Logger.print("Line 130");:}
 				    | SEMICOLON {:Logger.print("Line 134");:};
 
 method_declaration ::=
-    modifier_loop type:t IDENTIFIER:id LPAREN
+    modifier_loop type:t IDENTIFIER:id LPAREN {:SemanticImpl.getInstance().getCodeGenerator().addFunctionAddress(id);:}
     parameter_list_opt:p RPAREN {:Logger.print("Line 136 ");SemanticImpl.getInstance().validateFunction(id,(ArrayList<Parameter>) p,(Type)t);:}
     end_option:ep       {:Logger.print("Line 136b");
                         if(ep instanceof Expression){ SemanticImpl.getInstance().exitCurrentScope((Expression) ep);}
-                        else{  SemanticImpl.getInstance().exitCurrentScope();}
-                        SemanticImpl.getInstance().getCodeGenerator().addFunctionAddress(id);:};
+                        else{  SemanticImpl.getInstance().exitCurrentScope();}:};
 
 method_call ::=  IDENTIFIER:id LPAREN   {:Logger.print("Line 144");:}
 				 arglist_opt:args RPAREN {: if(args != null){
@@ -288,7 +287,7 @@ expression ::= numeric_expression:ne {:Logger.print("Line 257, ne = "); RESULT =
 						 				  RESULT = var.getValue();
 						 				  SemanticImpl.getInstance().getCodeGenerator().generateLDCode((Variable) var);:}
               | attribution:attr {: Logger.print(" Line 269 ");RESULT = attr;:}
-              | LPAREN expression:e1 LPAREN {: Logger.print("LINE 270");RESULT=e1;:}
+              | LPAREN expression:e1 RPAREN {: Logger.print("LINE 270");RESULT=e1;:}
               | expression:e2 expression_end_option {: Logger.print("LINE 271");RESULT=e2;:};
 
 attribution ::= IDENTIFIER:id EQ expression:e    {: Logger.print("Line 273 ");

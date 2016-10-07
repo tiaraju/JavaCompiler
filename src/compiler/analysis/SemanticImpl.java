@@ -65,6 +65,10 @@ public class SemanticImpl {
 	public int getBlockSize() {
 		return this.blockSize;
 	}
+	
+	public List<Function> getFunctions(){
+		return functions;
+	}
 
 	public void incBlockSize() {
 		this.blockSize++;
